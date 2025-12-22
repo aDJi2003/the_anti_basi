@@ -9,6 +9,10 @@ class AppColors {
   static const Color primaryLight = Color(0xFFECFDF5);
   static const Color primaryDark = Color(0xFF059669);
 
+  // Accent Colors (Coral/Salmon - for branding elements)
+  static const Color accent = Color(0xFFEF4444);
+  static const Color accentLight = Color(0xFFFEE2E2);
+
   // Status Colors
   static const Color warning = Color(0xFFF59E0B);
   static const Color warningLight = Color(0xFFFFFBEB);
