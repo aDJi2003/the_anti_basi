@@ -4,14 +4,13 @@ import '../ui/screens/auth/login_screen.dart';
 import '../ui/screens/home/home_screen.dart';
 import '../ui/screens/inventory/inventory_screen.dart';
 import '../ui/screens/main/main_shell.dart';
+import '../ui/screens/profile/profile_screen.dart';
+import '../ui/screens/scan/scan_screen.dart';
+import '../ui/screens/scan_results/scan_results_screen.dart';
 import '../ui/screens/splash/splash_screen.dart';
 import '../ui/screens/recipe/recipe_suggestion_screen.dart';
 import '../ui/screens/recipe/recipe_detail_screen.dart';
-import '../ui/screens/profile/profile_screen.dart'; // Assuming this screen exists
-import '../ui/screens/scan/scan_screen.dart'; // Assuming this screen exists
-import '../ui/screens/settings/settings_screen.dart'; // Assuming this screen exists
-import '../ui/screens/scan/scan_results_screen.dart'; // Assuming this screen exists
-import '../../data/models/inventory_item.dart'; // Assuming this model exists
+import '../ui/screens/settings/settings_screen.dart';
 
 /// Route names
 class Routes {
@@ -63,23 +62,20 @@ class AppRouter {
           GoRoute(
             path: Routes.home,
             name: 'home',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: HomeScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: HomeScreen()),
           ),
           GoRoute(
             path: Routes.inventory,
             name: 'inventory',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: InventoryScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: InventoryScreen()),
           ),
           GoRoute(
             path: Routes.recipes,
             name: 'recipes',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: RecipeSuggestionScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: RecipeSuggestionScreen()),
             routes: [
               GoRoute(
                 path: 'detail/:id',
@@ -91,9 +87,8 @@ class AppRouter {
           GoRoute(
             path: Routes.profile,
             name: 'profile',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: ProfileScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ProfileScreen()),
           ),
         ],
       ),
@@ -112,17 +107,7 @@ class AppRouter {
       GoRoute(
         path: Routes.scanResults,
         name: 'scanResults',
-        builder: (context, state) => ScanResultsScreen(
-          // For demonstration, pass dummy data or extract from state.extra
-          item: InventoryItem(
-            id: 'temp',
-            name: 'Scanned Item',
-            category: ItemCategory.dairy, // Default category
-            quantity: 1.0,
-            unit: 'unit',
-            expiryDate: DateTime.now().add(const Duration(days: 7)),
-          ),
-        ),
+        builder: (context, state) => const ScanResultsScreen(),
       ),
     ],
   );

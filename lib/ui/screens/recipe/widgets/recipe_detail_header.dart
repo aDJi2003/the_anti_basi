@@ -36,7 +36,7 @@ class RecipeDetailHeader extends StatelessWidget {
                     color: Colors.white.withOpacity(0.8),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.arrow_back,
                     color: AppColors.darkGrey,
                   ),

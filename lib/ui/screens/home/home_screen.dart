@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../config/app_colors.dart';
-import '../recipe/widgets/recipe_suggestion.dart';
+import 'package:the_anti_basi/config/app_colors.dart';
+import 'package:the_anti_basi/ui/screens/recipe/widgets/recipe_suggestion.dart';
 import 'home_controller.dart';
 import 'widgets/ai_assistant_card.dart';
 import 'widgets/attention_banner.dart';
@@ -113,7 +113,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           TextButton(
                             onPressed: () {
                               // Navigate to the full list of recipe suggestions
-                              // For now, let's navigate to a placeholder or the main recipe screen
                               controller.navigateToRecipes(context);
                             },
                             child: Text(
@@ -129,7 +128,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 16)),
-                  SliverToBoxAdapter(
+                  const SliverToBoxAdapter(
                     child: RecipeSuggestion(), // Use the newly created widget
                   ),
 

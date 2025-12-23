@@ -65,7 +65,7 @@ class RecipeCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.star_rounded, color: AppColors.yellow, size: 16),
+                      const Icon(Icons.star_rounded, color: AppColors.yellow, size: 16),
                       const SizedBox(width: 4),
                       Text(
                         rating.toStringAsFixed(1),

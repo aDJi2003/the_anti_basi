@@ -12,19 +12,6 @@ class RecipeSuggestion extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        /*  Removed: This title is now handled in home_screen.dart
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(
-            'Recipe Suggestions',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.darkGrey,
-                ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        */
         SizedBox(
           height: 250, // Adjust height as needed
           child: ListView.builder(
@@ -40,7 +27,7 @@ class RecipeSuggestion extends StatelessWidget {
                   rating: 4.5,
                   calories: 450,
                   onTap: () {
-                    context.goNamed(Routes.recipeDetail,
+                    context.goNamed('recipeDetail',
                         pathParameters: {'id': index.toString()});
                   },
                 ),

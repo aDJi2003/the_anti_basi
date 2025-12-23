@@ -15,7 +15,7 @@ class RecipeDetailScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: RecipeDetailHeader(
               imageUrl: 'https://via.placeholder.com/400x250',
               title: 'Delicious Pasta with Pesto',
@@ -36,22 +36,22 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                   ),
                   const SizedBox(height: 16),
-                  IngredientCard(
+                  const IngredientCard(
                     ingredientName: 'Pasta',
                     quantity: '200g',
                   ),
                   const SizedBox(height: 8),
-                  IngredientCard(
+                  const IngredientCard(
                     ingredientName: 'Pesto Sauce',
                     quantity: '100g',
                   ),
                   const SizedBox(height: 8),
-                  IngredientCard(
+                  const IngredientCard(
                     ingredientName: 'Cherry Tomatoes',
                     quantity: '1 cup',
                   ),
                   const SizedBox(height: 8),
-                  IngredientCard(
+                  const IngredientCard(
                     ingredientName: 'Parmesan Cheese',
                     quantity: '50g',
                   ),
@@ -64,19 +64,19 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                   ),
                   const SizedBox(height: 16),
-                  InstructionCard(
+                  const InstructionCard(
                     stepNumber: 1,
                     instruction:
                         'Boil pasta according to package directions until al dente.',
                   ),
                   const SizedBox(height: 8),
-                  InstructionCard(
+                  const InstructionCard(
                     stepNumber: 2,
                     instruction:
                         'Drain pasta and return to the pot. Stir in pesto sauce and cherry tomatoes.',
                   ),
                   const SizedBox(height: 8),
-                  InstructionCard(
+                  const InstructionCard(
                     stepNumber: 3,
                     instruction:
                         'Serve hot, topped with grated parmesan cheese.',
@@ -90,17 +90,17 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                   ),
                   const SizedBox(height: 16),
-                  UtensilCard(
+                  const UtensilCard(
                     utensilName: 'Large Pot',
                     icon: Icons.soup_kitchen,
                   ),
                   const SizedBox(height: 8),
-                  UtensilCard(
+                  const UtensilCard(
                     utensilName: 'Colander',
                     icon: Icons.filter_alt,
                   ),
                   const SizedBox(height: 8),
-                  UtensilCard(
+                  const UtensilCard(
                     utensilName: 'Mixing Spoon',
                     icon: Icons.restaurant_menu,
                   ),
