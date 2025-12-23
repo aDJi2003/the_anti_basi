@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../widgets/common/notification_button.dart';
 
 /// Home screen header with user greeting and notification bell
 class HomeHeader extends StatelessWidget {
@@ -7,15 +8,11 @@ class HomeHeader extends StatelessWidget {
     super.key,
     required this.userName,
     this.userAvatarUrl,
-    this.notificationCount = 0,
-    this.onNotificationTap,
     this.onAvatarTap,
   });
 
   final String userName;
   final String? userAvatarUrl;
-  final int notificationCount;
-  final VoidCallback? onNotificationTap;
   final VoidCallback? onAvatarTap;
 
   @override
@@ -58,11 +55,8 @@ class HomeHeader extends StatelessWidget {
 
           const Spacer(),
 
-          // Notification bell
-          _NotificationButton(
-            count: notificationCount,
-            onTap: onNotificationTap,
-          ),
+          // Notification button (shared widget)
+          const NotificationButton(),
         ],
       ),
     );
@@ -104,58 +98,5 @@ class HomeHeader extends StatelessWidget {
     if (hour < 12) return 'Good morning,';
     if (hour < 17) return 'Good afternoon,';
     return 'Good evening,';
-  }
-}
-
-/// Notification bell button with badge
-class _NotificationButton extends StatelessWidget {
-  const _NotificationButton({
-    required this.count,
-    this.onTap,
-  });
-
-  final int count;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.white,
-      shape: const CircleBorder(
-        side: BorderSide(color: AppColors.gray100),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: SizedBox(
-          width: 44,
-          height: 44,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              const Icon(
-                Icons.notifications_none_rounded,
-                color: AppColors.gray600,
-                size: 24,
-              ),
-              if (count > 0)
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.white, width: 1.5),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

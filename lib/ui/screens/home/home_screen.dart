@@ -46,10 +46,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: HomeHeader(
                       userName: state.userName,
                       userAvatarUrl: state.userAvatarUrl,
-                      notificationCount: state.attentionCount,
-                      onNotificationTap: () {
-                        // TODO: Show notifications
-                      },
                     ),
                   ),
 

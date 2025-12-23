@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../widgets/common/notification_button.dart';
 
 /// Header for recipe suggestion screen with CTA
 class RecipeScreenHeader extends StatelessWidget {
-  const RecipeScreenHeader({
-    super.key,
-    this.notificationCount = 0,
-    this.onNotificationTap,
-  });
-
-  final int notificationCount;
-  final VoidCallback? onNotificationTap;
+  const RecipeScreenHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,35 +34,8 @@ class RecipeScreenHeader extends StatelessWidget {
               ],
             ),
           ),
-          // Notification button
-          Stack(
-            children: [
-              IconButton(
-                onPressed: onNotificationTap,
-                icon: const Icon(
-                  Icons.notifications_outlined,
-                  color: AppColors.darkGrey,
-                ),
-                style: IconButton.styleFrom(
-                  backgroundColor: AppColors.lightGrey,
-                  padding: const EdgeInsets.all(12),
-                ),
-              ),
-              if (notificationCount > 0)
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: AppColors.accent,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-            ],
-          ),
+          // Notification button (shared widget)
+          const NotificationButton(),
         ],
       ),
     );
