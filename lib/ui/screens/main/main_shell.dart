@@ -53,7 +53,7 @@ class MainShell extends StatelessWidget {
         // TODO: context.go(Routes.recipes);
         break;
       case 3:
-        // TODO: context.go(Routes.profile);
+        context.go(Routes.profile);
         break;
     }
   }

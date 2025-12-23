@@ -4,6 +4,7 @@ import '../ui/screens/auth/login_screen.dart';
 import '../ui/screens/home/home_screen.dart';
 import '../ui/screens/inventory/inventory_screen.dart';
 import '../ui/screens/main/main_shell.dart';
+import '../ui/screens/profile/profile_screen.dart';
 import '../ui/screens/splash/splash_screen.dart';
 
 /// Route names
@@ -68,7 +69,13 @@ class AppRouter {
             ),
           ),
           // TODO: Add recipes route
-          // TODO: Add profile route
+          GoRoute(
+            path: Routes.profile,
+            name: 'profile',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: ProfileScreen(),
+            ),
+          ),
         ],
       ),
 
