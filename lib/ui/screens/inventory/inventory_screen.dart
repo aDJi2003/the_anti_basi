@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../config/app_colors.dart';
-import '../../../config/routes.dart';
-import '../../widgets/common/app_bottom_nav_bar.dart';
 import 'inventory_controller.dart';
 import 'widgets/inventory_filter_chips.dart';
 import 'widgets/inventory_header.dart';
@@ -12,6 +9,7 @@ import 'widgets/inventory_section.dart';
 import 'widgets/restock_banner.dart';
 
 /// Inventory screen - Shows all fridge items
+/// Note: Bottom nav bar is handled by MainShell (like layout.tsx in React)
 class InventoryScreen extends ConsumerStatefulWidget {
   const InventoryScreen({super.key});
 
@@ -21,7 +19,6 @@ class InventoryScreen extends ConsumerStatefulWidget {
 
 class _InventoryScreenState extends ConsumerState<InventoryScreen> {
   final _searchController = TextEditingController();
-  final int _currentNavIndex = 1; // Inventory tab
 
   @override
   void dispose() {
@@ -29,121 +26,95 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
     super.dispose();
   }
 
-  void _handleNavigation(BuildContext context, int index) {
-    if (index == _currentNavIndex) return;
-
-    switch (index) {
-      case 0: // Home
-        context.go(Routes.home);
-        break;
-      case 1: // Inventory - already here
-        break;
-      case 2: // Recipes
-        // TODO: Navigate to recipes
-        break;
-      case 3: // Profile
-        // TODO: Navigate to profile
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(inventoryControllerProvider);
     final controller = ref.read(inventoryControllerProvider.notifier);
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        bottom: false,
-        child: state.isLoading
-            ? const _LoadingState()
-            : RefreshIndicator(
-                onRefresh: controller.refresh,
-                color: AppColors.primary,
-                child: CustomScrollView(
-                  slivers: [
-                    // Header
-                    const SliverToBoxAdapter(
-                      child: InventoryHeader(
-                        title: 'Your Inventory',
-                      ),
+    return SafeArea(
+      bottom: false,
+      child: state.isLoading
+          ? const _LoadingState()
+          : RefreshIndicator(
+              onRefresh: controller.refresh,
+              color: AppColors.primary,
+              child: CustomScrollView(
+                slivers: [
+                  // Header
+                  const SliverToBoxAdapter(
+                    child: InventoryHeader(
+                      title: 'Your Inventory',
                     ),
+                  ),
 
-                    // Search bar
-                    SliverToBoxAdapter(
-                      child: InventorySearchBar(
-                        controller: _searchController,
-                        onChanged: controller.onSearchChanged,
-                      ),
+                  // Search bar
+                  SliverToBoxAdapter(
+                    child: InventorySearchBar(
+                      controller: _searchController,
+                      onChanged: controller.onSearchChanged,
                     ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-                    // Filter chips
+                  // Filter chips
+                  SliverToBoxAdapter(
+                    child: InventoryFilterChips(
+                      selectedFilter: state.selectedFilter,
+                      onFilterChanged: controller.onFilterChanged,
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+
+                  // Expiring soon section
+                  if (state.expiringItems.isNotEmpty) ...[
                     SliverToBoxAdapter(
-                      child: InventoryFilterChips(
-                        selectedFilter: state.selectedFilter,
-                        onFilterChanged: controller.onFilterChanged,
+                      child: InventorySection(
+                        title: 'Expiring Soon',
+                        items: state.expiringItems,
+                        onViewAll: () {
+                          controller
+                              .onFilterChanged(InventoryFilter.expiringSoon);
+                        },
+                        onItemTap: (item) =>
+                            controller.navigateToItemDetail(context, item),
                       ),
                     ),
                     const SliverToBoxAdapter(child: SizedBox(height: 24)),
-
-                    // Expiring soon section
-                    if (state.expiringItems.isNotEmpty) ...[
-                      SliverToBoxAdapter(
-                        child: InventorySection(
-                          title: 'Expiring Soon',
-                          items: state.expiringItems,
-                          onViewAll: () {
-                            controller
-                                .onFilterChanged(InventoryFilter.expiringSoon);
-                          },
-                          onItemTap: (item) =>
-                              controller.navigateToItemDetail(context, item),
-                        ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 24)),
-                    ],
-
-                    // Fresh items section
-                    if (state.freshItems.isNotEmpty) ...[
-                      SliverToBoxAdapter(
-                        child: InventorySection(
-                          title: 'Fresh Items',
-                          items: state.freshItems,
-                          onItemTap: (item) =>
-                              controller.navigateToItemDetail(context, item),
-                        ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 24)),
-                    ],
-
-                    // Empty state
-                    if (state.filteredItems.isEmpty)
-                      const SliverToBoxAdapter(
-                        child: _EmptyState(),
-                      ),
-
-                    // Restock banner
-                    SliverToBoxAdapter(
-                      child: RestockBanner(
-                        onScanTap: () => controller.navigateToScan(context),
-                      ),
-                    ),
-
-                    // Bottom padding for nav bar
-                    const SliverToBoxAdapter(
-                      child: SizedBox(height: 100),
-                    ),
                   ],
-                ),
+
+                  // Fresh items section
+                  if (state.freshItems.isNotEmpty) ...[
+                    SliverToBoxAdapter(
+                      child: InventorySection(
+                        title: 'Fresh Items',
+                        items: state.freshItems,
+                        onItemTap: (item) =>
+                            controller.navigateToItemDetail(context, item),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                  ],
+
+                  // Empty state
+                  if (state.filteredItems.isEmpty)
+                    const SliverToBoxAdapter(
+                      child: _EmptyState(),
+                    ),
+
+                  // Restock banner
+                  SliverToBoxAdapter(
+                    child: RestockBanner(
+                      onScanTap: () => controller.navigateToScan(context),
+                    ),
+                  ),
+
+                  // Bottom padding for nav bar
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 100),
+                  ),
+                ],
               ),
-      ),
-      bottomNavigationBar: AppBottomNavBar(
-        currentIndex: _currentNavIndex,
-        onTap: (index) => _handleNavigation(context, index),
-        onAddTap: () => controller.navigateToScan(context),
-      ),
+            ),
     );
   }
 }
@@ -177,7 +148,7 @@ class _EmptyState extends StatelessWidget {
           Container(
             width: 80,
             height: 80,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.gray100,
               shape: BoxShape.circle,
             ),
