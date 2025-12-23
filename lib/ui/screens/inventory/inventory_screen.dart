@@ -41,9 +41,16 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
               child: CustomScrollView(
                 slivers: [
                   // Header
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: InventoryHeader(
                       title: 'Your Inventory',
+                      trailing: _NotificationButton(
+                        count: state.expiringItems.length,
+                        onTap: () {
+                          // Show expiring items
+                          controller.onFilterChanged(InventoryFilter.expiringSoon);
+                        },
+                      ),
                     ),
                   ),
 
@@ -129,6 +136,49 @@ class _LoadingState extends StatelessWidget {
       child: CircularProgressIndicator(
         color: AppColors.primary,
       ),
+    );
+  }
+}
+
+/// Notification button with badge
+class _NotificationButton extends StatelessWidget {
+  const _NotificationButton({
+    required this.count,
+    required this.onTap,
+  });
+
+  final int count;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        IconButton(
+          onPressed: onTap,
+          icon: const Icon(
+            Icons.notifications_outlined,
+            color: AppColors.darkGrey,
+          ),
+          style: IconButton.styleFrom(
+            backgroundColor: AppColors.lightGrey,
+            padding: const EdgeInsets.all(12),
+          ),
+        ),
+        if (count > 0)
+          Positioned(
+            right: 8,
+            top: 8,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(
+                color: AppColors.accent,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
