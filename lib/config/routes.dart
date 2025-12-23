@@ -5,6 +5,8 @@ import '../ui/screens/home/home_screen.dart';
 import '../ui/screens/inventory/inventory_screen.dart';
 import '../ui/screens/main/main_shell.dart';
 import '../ui/screens/profile/profile_screen.dart';
+import '../ui/screens/scan/scan_screen.dart';
+import '../ui/screens/scan_results/scan_results_screen.dart';
 import '../ui/screens/splash/splash_screen.dart';
 
 /// Route names
@@ -80,7 +82,16 @@ class AppRouter {
       ),
 
       // Routes outside shell (full screen overlays)
-      // TODO: Add scan route
+      GoRoute(
+        path: Routes.scan,
+        name: 'scan',
+        builder: (context, state) => const ScanScreen(),
+      ),
+      GoRoute(
+        path: Routes.scanResults,
+        name: 'scanResults',
+        builder: (context, state) => const ScanResultsScreen(),
+      ),
       // TODO: Add settings route
     ],
   );
