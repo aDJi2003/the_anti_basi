@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/app_colors.dart';
+import '../recipe/widgets/recipe_suggestion.dart';
 import 'home_controller.dart';
 import 'widgets/ai_assistant_card.dart';
 import 'widgets/attention_banner.dart';
@@ -92,6 +93,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       onItemTap: (item) =>
                           controller.navigateToItemDetail(context, item),
                     ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+
+                  // Recipe Suggestions Section
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Recipe Suggestions',
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.darkGrey,
+                                ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              // Navigate to the full list of recipe suggestions
+                              // For now, let's navigate to a placeholder or the main recipe screen
+                              controller.navigateToRecipes(context);
+                            },
+                            child: Text(
+                              'View All',
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                  SliverToBoxAdapter(
+                    child: RecipeSuggestion(), // Use the newly created widget
                   ),
 
                   // Bottom padding for nav bar

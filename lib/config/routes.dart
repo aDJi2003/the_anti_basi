@@ -5,6 +5,13 @@ import '../ui/screens/home/home_screen.dart';
 import '../ui/screens/inventory/inventory_screen.dart';
 import '../ui/screens/main/main_shell.dart';
 import '../ui/screens/splash/splash_screen.dart';
+import '../ui/screens/recipe/recipe_suggestion_screen.dart';
+import '../ui/screens/recipe/recipe_detail_screen.dart';
+import '../ui/screens/profile/profile_screen.dart'; // Assuming this screen exists
+import '../ui/screens/scan/scan_screen.dart'; // Assuming this screen exists
+import '../ui/screens/settings/settings_screen.dart'; // Assuming this screen exists
+import '../ui/screens/scan/scan_results_screen.dart'; // Assuming this screen exists
+import '../../data/models/inventory_item.dart'; // Assuming this model exists
 
 /// Route names
 class Routes {
@@ -18,7 +25,7 @@ class Routes {
   static const String scanResults = '/scan-results';
   static const String inventory = '/inventory';
   static const String recipes = '/recipes';
-  static const String recipeDetail = '/recipe/:id';
+  static const String recipeDetail = '/recipes/detail/:id';
   static const String profile = '/profile';
   static const String settings = '/settings';
 }
@@ -67,14 +74,56 @@ class AppRouter {
               child: InventoryScreen(),
             ),
           ),
-          // TODO: Add recipes route
-          // TODO: Add profile route
+          GoRoute(
+            path: Routes.recipes,
+            name: 'recipes',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: RecipeSuggestionScreen(),
+            ),
+            routes: [
+              GoRoute(
+                path: 'detail/:id',
+                name: 'recipeDetail',
+                builder: (context, state) => const RecipeDetailScreen(),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: Routes.profile,
+            name: 'profile',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: ProfileScreen(),
+            ),
+          ),
         ],
       ),
 
       // Routes outside shell (full screen overlays)
-      // TODO: Add scan route
-      // TODO: Add settings route
+      GoRoute(
+        path: Routes.scan,
+        name: 'scan',
+        builder: (context, state) => const ScanScreen(),
+      ),
+      GoRoute(
+        path: Routes.settings,
+        name: 'settings',
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: Routes.scanResults,
+        name: 'scanResults',
+        builder: (context, state) => ScanResultsScreen(
+          // For demonstration, pass dummy data or extract from state.extra
+          item: InventoryItem(
+            id: 'temp',
+            name: 'Scanned Item',
+            category: ItemCategory.dairy, // Default category
+            quantity: 1.0,
+            unit: 'unit',
+            expiryDate: DateTime.now().add(const Duration(days: 7)),
+          ),
+        ),
+      ),
     ],
   );
 }

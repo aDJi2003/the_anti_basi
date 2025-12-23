@@ -131,6 +131,11 @@ class HomeController extends Notifier<HomeState> {
     );
   }
 
+  /// Navigate to recipe suggestions
+  void navigateToRecipes(BuildContext context) {
+    context.go(Routes.recipes);
+  }
+
   /// Dummy data for development
   List<InventoryItem> _getDummyItems() {
     final now = DateTime.now();

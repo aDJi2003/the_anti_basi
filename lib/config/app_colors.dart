@@ -40,4 +40,9 @@ class AppColors {
   static const Color textMuted = gray400;
   static const Color border = gray200;
   static const Color divider = gray100;
+
+  // Additional colors for specific UI elements
+  static const Color darkGrey = Color(0xFF374151); // gray700
+  static const Color mediumGrey = Color(0xFF6B7280); // gray500
+  static const Color yellow = Color(0xFFFFC107);
 }
