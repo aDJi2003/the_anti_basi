@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../config/app_colors.dart';
+import '../../../config/routes.dart';
 import '../../widgets/common/app_bottom_nav_bar.dart';
 import 'home_controller.dart';
 import 'widgets/ai_assistant_card.dart';
@@ -19,12 +21,30 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _aiController = TextEditingController();
-  int _currentNavIndex = 0;
+  final int _currentNavIndex = 0; // Home tab
 
   @override
   void dispose() {
     _aiController.dispose();
     super.dispose();
+  }
+
+  void _handleNavigation(BuildContext context, int index) {
+    if (index == _currentNavIndex) return;
+
+    switch (index) {
+      case 0: // Home - already here
+        break;
+      case 1: // Inventory
+        context.go(Routes.inventory);
+        break;
+      case 2: // Recipes
+        // TODO: Navigate to recipes
+        break;
+      case 3: // Profile
+        // TODO: Navigate to profile
+        break;
+    }
   }
 
   @override
@@ -107,10 +127,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentNavIndex,
-        onTap: (index) {
-          setState(() => _currentNavIndex = index);
-          // TODO: Handle navigation
-        },
+        onTap: (index) => _handleNavigation(context, index),
         onAddTap: () => controller.navigateToScan(context),
       ),
     );

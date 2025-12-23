@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import '../ui/screens/auth/login_screen.dart';
 import '../ui/screens/home/home_screen.dart';
+import '../ui/screens/inventory/inventory_screen.dart';
 import '../ui/screens/splash/splash_screen.dart';
 
 /// Route names
@@ -43,6 +44,11 @@ class AppRouter {
         path: Routes.home,
         name: 'home',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: Routes.inventory,
+        name: 'inventory',
+        builder: (context, state) => const InventoryScreen(),
       ),
       // TODO: Add more routes as screens are created
     ],
