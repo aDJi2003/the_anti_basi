@@ -106,14 +106,12 @@ class HomeController extends Notifier<HomeState> {
 
   /// Navigate to inventory
   void navigateToInventory(BuildContext context) {
-    // TODO: Implement navigation
     context.go(Routes.inventory);
   }
 
   /// Navigate to add item (scan)
   void navigateToScan(BuildContext context) {
-    // TODO: Implement navigation
-    context.go(Routes.scan);
+    context.push(Routes.scan);
   }
 
   /// Navigate to item detail

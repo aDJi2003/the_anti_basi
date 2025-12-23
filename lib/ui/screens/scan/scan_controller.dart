@@ -105,13 +105,8 @@ class ScanController extends Notifier<ScanState> {
 
   /// Close scanner
   void close(BuildContext context) {
-    // TODO: Dispose camera
+    // Camera disposal will be handled when camera package is integrated
     context.pop();
-  }
-
-  /// Dispose camera resources
-  void dispose() {
-    // TODO: Dispose camera controller
   }
 
   void _showSnackBar(BuildContext context, String message) {

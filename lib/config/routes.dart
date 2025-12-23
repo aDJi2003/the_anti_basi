@@ -78,9 +78,12 @@ class AppRouter {
                 const NoTransitionPage(child: RecipeSuggestionScreen()),
             routes: [
               GoRoute(
-                path: 'detail/:id',
+                path: ':id',
                 name: 'recipeDetail',
-                builder: (context, state) => const RecipeDetailScreen(),
+                builder: (context, state) {
+                  final recipeId = state.pathParameters['id'] ?? '';
+                  return RecipeDetailScreen(recipeId: recipeId);
+                },
               ),
             ],
           ),

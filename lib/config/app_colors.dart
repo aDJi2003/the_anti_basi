@@ -46,5 +46,6 @@ class AppColors {
   // Additional colors for specific UI elements
   static const Color darkGrey = Color(0xFF374151); // gray700
   static const Color mediumGrey = Color(0xFF6B7280); // gray500
+  static const Color lightGrey = Color(0xFFF3F4F6); // gray100
   static const Color yellow = Color(0xFFFFC107);
 }
