@@ -1,31 +1,68 @@
 import 'package:flutter/material.dart';
-import '../../../widgets/common/feature_item.dart';
+import '../../../../config/app_colors.dart';
 
-/// Feature list section for login screen
+/// Compact feature list section for login screen
 class LoginFeatures extends StatelessWidget {
   const LoginFeatures({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return const Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _CompactFeature(
+          icon: Icons.qr_code_scanner_rounded,
+          label: 'Quick Scan',
+        ),
+        _CompactFeature(
+          icon: Icons.notifications_active_outlined,
+          label: 'Reminders',
+        ),
+        _CompactFeature(
+          icon: Icons.restaurant_outlined,
+          label: 'Recipes',
+        ),
+      ],
+    );
+  }
+}
+
+/// Compact feature item with icon and label
+class _CompactFeature extends StatelessWidget {
+  const _CompactFeature({
+    required this.icon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        FeatureItem(
-          icon: Icons.qr_code_scanner_rounded,
-          title: 'Quick Scan',
-          description: 'Instantly add groceries via barcode.',
+        Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withAlpha(20),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Icon(
+            icon,
+            size: 26,
+            color: AppColors.primary,
+          ),
         ),
-        SizedBox(height: 20),
-        FeatureItem(
-          icon: Icons.notifications_active_outlined,
-          title: 'Expiration Reminders',
-          description: 'Get notified before food spoils.',
-        ),
-        SizedBox(height: 20),
-        FeatureItem(
-          icon: Icons.restaurant_outlined,
-          title: 'Smart Recipes',
-          description: 'Cook meals with what you have.',
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textSecondary,
+          ),
         ),
       ],
     );

@@ -46,8 +46,11 @@ class LoginScreen extends ConsumerWidget {
                       // Login form
                       LoginForm(
                         isLoading: state.isLoading,
+                        isGoogleLoading: state.isGoogleLoading,
                         onLogin: (email, password) =>
                             controller.login(email, password, context),
+                        onGoogleSignIn: () =>
+                            controller.loginWithGoogle(context),
                         onSignUp: () => controller.navigateToSignUp(context),
                       ),
                       const SizedBox(height: 24),
