@@ -75,15 +75,26 @@ class ScannedItem {
   }
 
   /// Convert to InventoryItem for saving
-  InventoryItem toInventoryItem() {
+  InventoryItem toInventoryItem({String? displayName}) {
     return InventoryItem(
       id: id,
-      name: name,
+      name: name.toLowerCase(),
+      displayName: displayName ?? _capitalizeFirst(name),
       category: category,
       quantity: quantity,
       unit: unit,
       expiryDate: expiryDate ?? DateTime.now().add(const Duration(days: 7)),
+      addedAt: DateTime.now(),
     );
+  }
+
+  /// Capitalize first letter of each word
+  String _capitalizeFirst(String text) {
+    if (text.isEmpty) return text;
+    return text.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
   }
 
   /// Create a copy with updated fields

@@ -25,10 +25,13 @@ class InventoryState {
   List<InventoryItem> get filteredItems {
     var items = allItems;
 
-    // Apply search filter
+    // Apply search filter (search by displayName or name)
     if (searchQuery.isNotEmpty) {
+      final query = searchQuery.toLowerCase();
       items = items
-          .where((i) => i.name.toLowerCase().contains(searchQuery.toLowerCase()))
+          .where((i) =>
+              i.displayName.toLowerCase().contains(query) ||
+              i.name.toLowerCase().contains(query))
           .toList();
     }
 
@@ -158,68 +161,84 @@ class InventoryController extends Notifier<InventoryState> {
       // Expiring items
       InventoryItem(
         id: '1',
-        name: 'Whole Milk',
+        name: 'milk',
+        displayName: 'Whole Milk',
         category: ItemCategory.dairy,
         quantity: 0.5,
         unit: 'Gal',
         expiryDate: DateTime(now.year, now.month, now.day + 1),
+        addedAt: now.subtract(const Duration(days: 5)),
       ),
       InventoryItem(
         id: '2',
-        name: 'Sourdough',
+        name: 'bread',
+        displayName: 'Sourdough',
         category: ItemCategory.grain,
         quantity: 4,
         unit: 'Slices',
         expiryDate: DateTime(now.year, now.month, now.day + 2),
+        addedAt: now.subtract(const Duration(days: 3)),
       ),
       // Fresh items
       InventoryItem(
         id: '3',
-        name: 'Organic Eggs',
+        name: 'eggs',
+        displayName: 'Organic Eggs',
         category: ItemCategory.protein,
         quantity: 12,
         unit: 'ct',
         expiryDate: DateTime(now.year, now.month, now.day + 10),
+        addedAt: now.subtract(const Duration(days: 2)),
       ),
       InventoryItem(
         id: '4',
-        name: 'Chicken Breast',
+        name: 'chicken',
+        displayName: 'Chicken Breast',
         category: ItemCategory.protein,
         quantity: 2,
         unit: 'lbs',
         expiryDate: DateTime(now.year, now.month, now.day + 5),
+        addedAt: now.subtract(const Duration(days: 1)),
       ),
       InventoryItem(
         id: '5',
-        name: 'Spinach',
+        name: 'spinach',
+        displayName: 'Spinach',
         category: ItemCategory.vegetable,
         quantity: 1,
         unit: 'Bag',
         expiryDate: DateTime(now.year, now.month, now.day + 4),
+        addedAt: now.subtract(const Duration(days: 2)),
       ),
       InventoryItem(
         id: '6',
-        name: 'Greek Yogurt',
+        name: 'yogurt',
+        displayName: 'Greek Yogurt',
         category: ItemCategory.dairy,
         quantity: 500,
         unit: 'g',
         expiryDate: DateTime(now.year, now.month, now.day + 7),
+        addedAt: now.subtract(const Duration(days: 4)),
       ),
       InventoryItem(
         id: '7',
-        name: 'Orange Juice',
+        name: 'juice',
+        displayName: 'Orange Juice',
         category: ItemCategory.beverage,
         quantity: 1,
         unit: 'L',
         expiryDate: DateTime(now.year, now.month, now.day + 14),
+        addedAt: now.subtract(const Duration(days: 7)),
       ),
       InventoryItem(
         id: '8',
-        name: 'Cheddar Cheese',
+        name: 'cheese',
+        displayName: 'Cheddar Cheese',
         category: ItemCategory.dairy,
         quantity: 200,
         unit: 'g',
         expiryDate: DateTime(now.year, now.month, now.day + 21),
+        addedAt: now.subtract(const Duration(days: 10)),
       ),
     ];
   }
