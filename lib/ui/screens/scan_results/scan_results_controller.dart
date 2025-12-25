@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../../../config/routes.dart';
 import '../../../data/models/inventory_item.dart';
 import '../../../data/models/scanned_item.dart';
+import '../../../data/repositories/inventory_repository.dart';
 import 'widgets/manual_input_sheet.dart';
 
 /// Scan results screen state
@@ -50,6 +51,8 @@ class ScanResultsController extends Notifier<ScanResultsState> {
     _loadDummyData();
     return const ScanResultsState(isLoading: true);
   }
+
+  InventoryRepository get _repository => ref.read(inventoryRepositoryProvider);
 
   /// Load dummy scan results (replace with actual AI results)
   Future<void> _loadDummyData() async {
@@ -202,8 +205,13 @@ class ScanResultsController extends Notifier<ScanResultsState> {
     state = state.copyWith(isSaving: true);
 
     try {
-      // TODO: Actually save to Firestore
-      await Future.delayed(const Duration(milliseconds: 500));
+      // Convert ScannedItems to InventoryItems
+      final inventoryItems = selectedItems
+          .map((item) => item.toInventoryItem())
+          .toList();
+
+      // Save to Firestore
+      await _repository.addItems(inventoryItems);
 
       if (context.mounted) {
         _showSnackBar(context, '${selectedItems.length} items added to inventory');
