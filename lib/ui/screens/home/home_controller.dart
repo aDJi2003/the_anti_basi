@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../config/routes.dart';
 import '../../../data/models/inventory_item.dart';
 
@@ -66,11 +67,17 @@ class HomeController extends Notifier<HomeState> {
       // Simulate network delay
       await Future.delayed(const Duration(milliseconds: 500));
 
+      final currentUser = FirebaseAuth.instance.currentUser;
+      final userName = currentUser?.displayName ?? 'Budi';
+      final userPhoto = currentUser?.photoURL;
+
       // TODO: Replace with actual data fetching
       final dummyItems = _getDummyItems();
 
       state = state.copyWith(
         isLoading: false,
+        userName: userName,
+        userAvatarUrl: userPhoto,
         totalItems: 32,
         expiringItems: dummyItems,
         lastUpdated: DateTime.now(),

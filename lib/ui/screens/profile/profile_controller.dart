@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../config/routes.dart';
 
 /// User profile data
@@ -60,10 +61,13 @@ class ProfileController extends Notifier<ProfileState> {
     try {
       await Future.delayed(const Duration(milliseconds: 300));
 
+      final currentUser = FirebaseAuth.instance.currentUser;
+      
       // Dummy user data
-      const user = UserProfile(
-        name: 'Budi',
-        email: 'budi@student.edu',
+      final user = UserProfile(
+        name: currentUser?.displayName ?? 'Budi',
+        email: currentUser?.email ?? 'budi@student.edu',
+        avatarUrl: currentUser?.photoURL,
         subtitle: 'Student • Food Saver',
       );
 
@@ -122,8 +126,11 @@ class ProfileController extends Notifier<ProfileState> {
     );
 
     if (confirmed == true && context.mounted) {
-      // TODO: Clear auth state
-      context.go(Routes.login);
+      // Clear auth state
+      await FirebaseAuth.instance.signOut();
+      if (context.mounted) {
+        context.go(Routes.login);
+      }
     }
   }
 
