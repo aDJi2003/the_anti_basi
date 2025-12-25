@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,17 +20,12 @@ class SplashController extends Notifier<SplashState> {
   /// Initialize splash screen logic
   Future<void> init(BuildContext context) async {
     try {
-      // Simulate loading (will be replaced with actual init logic)
+      // Show splash for minimum duration
       await Future.delayed(AppConstants.splashDuration);
-
-      // TODO: Add actual initialization logic here:
-      // - Check auth state
-      // - Load user preferences
-      // - Initialize services
 
       state = SplashState.ready;
 
-      // Navigate to next screen
+      // Navigate based on auth state
       if (context.mounted) {
         _navigateToNextScreen(context);
       }
@@ -41,13 +37,15 @@ class SplashController extends Notifier<SplashState> {
 
   /// Navigate based on auth state
   void _navigateToNextScreen(BuildContext context) {
-    // TODO: Check if user is logged in
-    // For now, navigate to login
-    // In future:
-    // - If logged in -> go to home
-    // - If not logged in -> go to login
+    final currentUser = FirebaseAuth.instance.currentUser;
 
-    context.go(Routes.login);
+    if (currentUser != null) {
+      // User is logged in -> go to home
+      context.go(Routes.home);
+    } else {
+      // User is not logged in -> go to login
+      context.go(Routes.login);
+    }
   }
 }
 
