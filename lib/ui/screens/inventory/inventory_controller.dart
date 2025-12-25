@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/routes.dart';
 import '../../../data/models/inventory_item.dart';
+import '../../../data/repositories/inventory_repository.dart';
 import 'widgets/inventory_filter_chips.dart';
 
 /// Inventory screen state
@@ -99,16 +100,16 @@ class InventoryController extends Notifier<InventoryState> {
     return const InventoryState(isLoading: true);
   }
 
-  /// Load inventory data
+  InventoryRepository get _repository => ref.read(inventoryRepositoryProvider);
+
+  /// Load inventory data from Firestore
   Future<void> _loadData() async {
     try {
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      final dummyItems = _getDummyItems();
+      final items = await _repository.getInventory();
 
       state = state.copyWith(
         isLoading: false,
-        allItems: dummyItems,
+        allItems: items,
       );
     } catch (e) {
       state = state.copyWith(
@@ -120,7 +121,7 @@ class InventoryController extends Notifier<InventoryState> {
 
   /// Refresh data
   Future<void> refresh() async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, errorMessage: null);
     await _loadData();
   }
 
@@ -143,7 +144,7 @@ class InventoryController extends Notifier<InventoryState> {
   void navigateToItemDetail(BuildContext context, InventoryItem item) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Viewing: ${item.name}'),
+        content: Text('Viewing: ${item.displayName}'),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
         shape: RoundedRectangleBorder(
@@ -153,94 +154,24 @@ class InventoryController extends Notifier<InventoryState> {
     );
   }
 
-  /// Dummy data for development
-  List<InventoryItem> _getDummyItems() {
-    final now = DateTime.now();
+  /// Delete an item from inventory
+  Future<void> deleteItem(String itemId) async {
+    try {
+      await _repository.deleteItem(itemId);
+      await refresh();
+    } catch (e) {
+      state = state.copyWith(errorMessage: e.toString());
+    }
+  }
 
-    return [
-      // Expiring items
-      InventoryItem(
-        id: '1',
-        name: 'milk',
-        displayName: 'Whole Milk',
-        category: ItemCategory.dairy,
-        quantity: 0.5,
-        unit: 'Gal',
-        expiryDate: DateTime(now.year, now.month, now.day + 1),
-        addedAt: now.subtract(const Duration(days: 5)),
-      ),
-      InventoryItem(
-        id: '2',
-        name: 'bread',
-        displayName: 'Sourdough',
-        category: ItemCategory.grain,
-        quantity: 4,
-        unit: 'Slices',
-        expiryDate: DateTime(now.year, now.month, now.day + 2),
-        addedAt: now.subtract(const Duration(days: 3)),
-      ),
-      // Fresh items
-      InventoryItem(
-        id: '3',
-        name: 'eggs',
-        displayName: 'Organic Eggs',
-        category: ItemCategory.protein,
-        quantity: 12,
-        unit: 'ct',
-        expiryDate: DateTime(now.year, now.month, now.day + 10),
-        addedAt: now.subtract(const Duration(days: 2)),
-      ),
-      InventoryItem(
-        id: '4',
-        name: 'chicken',
-        displayName: 'Chicken Breast',
-        category: ItemCategory.protein,
-        quantity: 2,
-        unit: 'lbs',
-        expiryDate: DateTime(now.year, now.month, now.day + 5),
-        addedAt: now.subtract(const Duration(days: 1)),
-      ),
-      InventoryItem(
-        id: '5',
-        name: 'spinach',
-        displayName: 'Spinach',
-        category: ItemCategory.vegetable,
-        quantity: 1,
-        unit: 'Bag',
-        expiryDate: DateTime(now.year, now.month, now.day + 4),
-        addedAt: now.subtract(const Duration(days: 2)),
-      ),
-      InventoryItem(
-        id: '6',
-        name: 'yogurt',
-        displayName: 'Greek Yogurt',
-        category: ItemCategory.dairy,
-        quantity: 500,
-        unit: 'g',
-        expiryDate: DateTime(now.year, now.month, now.day + 7),
-        addedAt: now.subtract(const Duration(days: 4)),
-      ),
-      InventoryItem(
-        id: '7',
-        name: 'juice',
-        displayName: 'Orange Juice',
-        category: ItemCategory.beverage,
-        quantity: 1,
-        unit: 'L',
-        expiryDate: DateTime(now.year, now.month, now.day + 14),
-        addedAt: now.subtract(const Duration(days: 7)),
-      ),
-      InventoryItem(
-        id: '8',
-        name: 'cheese',
-        displayName: 'Cheddar Cheese',
-        category: ItemCategory.dairy,
-        quantity: 200,
-        unit: 'g',
-        expiryDate: DateTime(now.year, now.month, now.day + 21),
-        addedAt: now.subtract(const Duration(days: 10)),
-      ),
-    ];
+  /// Update item quantity
+  Future<void> updateItemQuantity(String itemId, double newQuantity) async {
+    try {
+      await _repository.updateQuantity(itemId, newQuantity);
+      await refresh();
+    } catch (e) {
+      state = state.copyWith(errorMessage: e.toString());
+    }
   }
 }
 

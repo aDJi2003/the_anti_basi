@@ -1,15 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../config/routes.dart';
 import '../../../data/models/inventory_item.dart';
+import '../../../data/repositories/inventory_repository.dart';
 
 /// Home screen state
 class HomeState {
   const HomeState({
     this.isLoading = false,
-    this.userName = 'Budi',
+    this.userName = 'User',
     this.userAvatarUrl,
     this.totalItems = 0,
     this.expiringItems = const [],
@@ -26,9 +28,11 @@ class HomeState {
   final String? errorMessage;
 
   int get attentionCount => expiringItems
-      .where((i) =>
-          i.expiryStatus == ExpiryStatus.expired ||
-          i.expiryStatus == ExpiryStatus.expiringToday)
+      .where(
+        (i) =>
+            i.expiryStatus == ExpiryStatus.expired ||
+            i.expiryStatus == ExpiryStatus.expiringToday,
+      )
       .length;
 
   HomeState copyWith({
@@ -56,43 +60,60 @@ class HomeState {
 class HomeController extends Notifier<HomeState> {
   @override
   HomeState build() {
-    // Load data on initialization
     _loadData();
     return const HomeState(isLoading: true);
   }
 
-  /// Load home data (TODO: Replace with actual API call)
+  InventoryRepository get _repository => ref.read(inventoryRepositoryProvider);
+
+  /// Load home data from Firestore
   Future<void> _loadData() async {
     try {
-      // Simulate network delay
-      await Future.delayed(const Duration(milliseconds: 500));
+      // Get current user info
+      final user = FirebaseAuth.instance.currentUser;
+      debugPrint('[HomeController] Current user: ${user?.uid}');
 
-      final currentUser = FirebaseAuth.instance.currentUser;
-      final userName = currentUser?.displayName ?? 'Budi';
-      final userPhoto = currentUser?.photoURL;
+      final userName =
+          user?.displayName ?? user?.email?.split('@').first ?? 'User';
+      final userAvatar = user?.photoURL;
 
-      // TODO: Replace with actual data fetching
-      final dummyItems = _getDummyItems();
+      // Fetch inventory from Firestore
+      debugPrint('[HomeController] Fetching inventory...');
+      final allItems = await _repository.getInventory();
+      debugPrint('[HomeController] Got ${allItems.length} items');
+
+      // Filter expiring items (within 3 days or already expired)
+      final expiringItems =
+          allItems
+              .where(
+                (item) =>
+                    item.expiryStatus == ExpiryStatus.expired ||
+                    item.expiryStatus == ExpiryStatus.expiringToday ||
+                    item.expiryStatus == ExpiryStatus.expiringSoon,
+              )
+              .toList()
+            ..sort((a, b) => a.daysUntilExpiry.compareTo(b.daysUntilExpiry));
+
+      debugPrint('[HomeController] Expiring items: ${expiringItems.length}');
 
       state = state.copyWith(
         isLoading: false,
         userName: userName,
-        userAvatarUrl: userPhoto,
-        totalItems: 32,
-        expiringItems: dummyItems,
+        userAvatarUrl: userAvatar,
+        totalItems: allItems.length,
+        expiringItems: expiringItems,
         lastUpdated: DateTime.now(),
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString(),
-      );
+    } catch (e, stack) {
+      debugPrint('[HomeController] ERROR: $e');
+      debugPrint('[HomeController] Stack: $stack');
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }
 
   /// Refresh data
   Future<void> refresh() async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, errorMessage: null);
     await _loadData();
   }
 
@@ -104,9 +125,7 @@ class HomeController extends Notifier<HomeState> {
         content: Text('AI Query: $query'),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -129,9 +148,7 @@ class HomeController extends Notifier<HomeState> {
         content: Text('Viewing: ${item.name}'),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -140,66 +157,9 @@ class HomeController extends Notifier<HomeState> {
   void navigateToRecipes(BuildContext context) {
     context.go(Routes.recipes);
   }
-
-  /// Dummy data for development
-  List<InventoryItem> _getDummyItems() {
-    final now = DateTime.now();
-
-    return [
-      InventoryItem(
-        id: '1',
-        name: 'milk',
-        displayName: 'Fresh Milk',
-        category: ItemCategory.dairy,
-        quantity: 1.5,
-        unit: 'L',
-        expiryDate: DateTime(now.year, now.month, now.day),
-        addedAt: now.subtract(const Duration(days: 3)),
-      ),
-      InventoryItem(
-        id: '2',
-        name: 'eggs',
-        displayName: 'Organic Eggs',
-        category: ItemCategory.protein,
-        quantity: 6,
-        unit: 'pcs',
-        expiryDate: DateTime(now.year, now.month, now.day),
-        addedAt: now.subtract(const Duration(days: 5)),
-      ),
-      InventoryItem(
-        id: '3',
-        name: 'spinach',
-        displayName: 'Spinach',
-        category: ItemCategory.vegetable,
-        quantity: 200,
-        unit: 'g',
-        expiryDate: DateTime(now.year, now.month, now.day + 1),
-        addedAt: now.subtract(const Duration(days: 1)),
-      ),
-      InventoryItem(
-        id: '4',
-        name: 'salmon',
-        displayName: 'Salmon Fillet',
-        category: ItemCategory.protein,
-        quantity: 300,
-        unit: 'g',
-        expiryDate: DateTime(now.year, now.month, now.day + 1),
-        addedAt: now.subtract(const Duration(days: 2)),
-      ),
-      InventoryItem(
-        id: '5',
-        name: 'yogurt',
-        displayName: 'Greek Yogurt',
-        category: ItemCategory.dairy,
-        quantity: 500,
-        unit: 'g',
-        expiryDate: DateTime(now.year, now.month, now.day + 2),
-        addedAt: now.subtract(const Duration(days: 4)),
-      ),
-    ];
-  }
 }
 
 /// Provider for home controller
-final homeControllerProvider =
-    NotifierProvider<HomeController, HomeState>(HomeController.new);
+final homeControllerProvider = NotifierProvider<HomeController, HomeState>(
+  HomeController.new,
+);
