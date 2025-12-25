@@ -39,7 +39,7 @@ class AppRouter {
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: Routes.home,
+    initialLocation: Routes.splash,
     debugLogDiagnostics: true,
     routes: [
       // Auth routes (outside shell)
