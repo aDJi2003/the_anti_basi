@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../config/routes.dart';
 import '../../../data/models/user_profile.dart';
 import '../../../data/repositories/user_repository.dart';

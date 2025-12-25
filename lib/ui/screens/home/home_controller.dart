@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../config/routes.dart';
 import '../../../data/models/inventory_item.dart';
 import '../../../data/repositories/inventory_repository.dart';
@@ -27,9 +28,11 @@ class HomeState {
   final String? errorMessage;
 
   int get attentionCount => expiringItems
-      .where((i) =>
-          i.expiryStatus == ExpiryStatus.expired ||
-          i.expiryStatus == ExpiryStatus.expiringToday)
+      .where(
+        (i) =>
+            i.expiryStatus == ExpiryStatus.expired ||
+            i.expiryStatus == ExpiryStatus.expiringToday,
+      )
       .length;
 
   /// Get time-based greeting
@@ -93,13 +96,16 @@ class HomeController extends Notifier<HomeState> {
       debugPrint('[HomeController] Got ${allItems.length} items');
 
       // Filter expiring items (within 3 days or already expired)
-      final expiringItems = allItems
-          .where((item) =>
-              item.expiryStatus == ExpiryStatus.expired ||
-              item.expiryStatus == ExpiryStatus.expiringToday ||
-              item.expiryStatus == ExpiryStatus.expiringSoon)
-          .toList()
-        ..sort((a, b) => a.daysUntilExpiry.compareTo(b.daysUntilExpiry));
+      final expiringItems =
+          allItems
+              .where(
+                (item) =>
+                    item.expiryStatus == ExpiryStatus.expired ||
+                    item.expiryStatus == ExpiryStatus.expiringToday ||
+                    item.expiryStatus == ExpiryStatus.expiringSoon,
+              )
+              .toList()
+            ..sort((a, b) => a.daysUntilExpiry.compareTo(b.daysUntilExpiry));
 
       debugPrint('[HomeController] Expiring items: ${expiringItems.length}');
 
@@ -114,10 +120,7 @@ class HomeController extends Notifier<HomeState> {
     } catch (e, stack) {
       debugPrint('[HomeController] ERROR: $e');
       debugPrint('[HomeController] Stack: $stack');
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }
 
@@ -135,9 +138,7 @@ class HomeController extends Notifier<HomeState> {
         content: Text('AI Query: $query'),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -160,9 +161,7 @@ class HomeController extends Notifier<HomeState> {
         content: Text('Viewing: ${item.name}'),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -174,5 +173,6 @@ class HomeController extends Notifier<HomeState> {
 }
 
 /// Provider for home controller
-final homeControllerProvider =
-    NotifierProvider<HomeController, HomeState>(HomeController.new);
+final homeControllerProvider = NotifierProvider<HomeController, HomeState>(
+  HomeController.new,
+);
