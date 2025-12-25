@@ -1,7 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../config/app_colors.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../../../config/routes.dart';
 
 /// Login screen state
@@ -35,34 +36,35 @@ class LoginController extends Notifier<LoginState> {
   LoginState build() => const LoginState();
 
   /// Login with email and password
-  Future<void> login(
-    String email,
-    String password,
-    BuildContext context,
-  ) async {
+  Future<void> login(String email, String password, BuildContext context) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
-
     try {
-      // TODO: Implement actual Firebase authentication
-      // For now, simulate login delay
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Simulate successful login
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      
       state = state.copyWith(isLoading: false);
-
-      // Navigate to home
+      
       if (context.mounted) {
         context.go(Routes.home);
       }
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString(),
-      );
-
-      if (context.mounted) {
-        _showErrorSnackBar(context, 'Login failed. Please try again.');
+    } on FirebaseAuthException catch (e) {
+      String message = 'Login failed';
+      
+      if (e.code == 'user-not-found') {
+        message = 'Email tidak ditemukan.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Password salah.';
+      } else if (e.code == 'invalid-credential') {
+        message = 'Email atau password salah.';
       }
+      
+      state = state.copyWith(isLoading: false, errorMessage: message);
+      if (context.mounted) _showErrorSnackBar(context, message);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      if (context.mounted) _showErrorSnackBar(context, 'Error: $e');
     }
   }
 
@@ -71,85 +73,58 @@ class LoginController extends Notifier<LoginState> {
     state = state.copyWith(isGoogleLoading: true, errorMessage: null);
 
     try {
-      // TODO: Implement actual Google Sign-In with Firebase
-      // final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      // final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
-      // final credential = GoogleAuthProvider.credential(
-      //   accessToken: googleAuth?.accessToken,
-      //   idToken: googleAuth?.idToken,
-      // );
-      // await FirebaseAuth.instance.signInWithCredential(credential);
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
-      // For now, simulate Google sign-in delay
-      await Future.delayed(const Duration(seconds: 2));
+      if (googleUser == null) {
+        state = state.copyWith(isGoogleLoading: false);
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
 
       state = state.copyWith(isGoogleLoading: false);
 
-      // Navigate to home
       if (context.mounted) {
-        _showSuccessSnackBar(context, 'Welcome! Signed in with Google');
+        _showSuccessSnackBar(context, 'Welcome ${googleUser.displayName}!');
         context.go(Routes.home);
       }
     } catch (e) {
-      state = state.copyWith(
-        isGoogleLoading: false,
-        errorMessage: e.toString(),
-      );
-
+      state = state.copyWith(isGoogleLoading: false, errorMessage: e.toString());
       if (context.mounted) {
-        _showErrorSnackBar(context, 'Google sign-in failed. Please try again.');
+        _showErrorSnackBar(context, 'Google Sign In Error: $e');
       }
     }
   }
 
-  /// Navigate to sign up screen
   void navigateToSignUp(BuildContext context) {
-    // TODO: Implement navigation to sign up screen
-    _showInfoSnackBar(context, 'Sign up coming soon!');
+    _showInfoSnackBar(context, 'Fitur daftar belum dibuat.');
   }
 
   void _showErrorSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
   void _showSuccessSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.green),
     );
   }
 
   void _showInfoSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
+      SnackBar(content: Text(message)),
     );
   }
 }
 
-/// Provider for login controller
-final loginControllerProvider =
-    NotifierProvider<LoginController, LoginState>(LoginController.new);
+final loginControllerProvider = NotifierProvider<LoginController, LoginState>(LoginController.new);
