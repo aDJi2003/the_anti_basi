@@ -3,13 +3,14 @@ import 'package:intl/intl.dart';
 import '../../../../config/app_colors.dart';
 import '../../../../data/models/scanned_item.dart';
 
-/// Individual scanned item tile with checkbox, qty, and date
+/// Individual scanned item tile with checkbox, qty, unit, and date
 class ScannedItemTile extends StatelessWidget {
   const ScannedItemTile({
     super.key,
     required this.item,
     required this.onToggle,
     required this.onQuantityChanged,
+    required this.onUnitChanged,
     required this.onDateTap,
     required this.onDelete,
   });
@@ -17,6 +18,7 @@ class ScannedItemTile extends StatelessWidget {
   final ScannedItem item;
   final VoidCallback onToggle;
   final ValueChanged<double> onQuantityChanged;
+  final ValueChanged<String> onUnitChanged;
   final VoidCallback onDateTap;
   final VoidCallback onDelete;
 
@@ -109,7 +111,7 @@ class ScannedItemTile extends StatelessWidget {
                     ],
                   ),
 
-                  // Qty and Date inputs (if not unknown)
+                  // Qty, Unit, and Date inputs (if not unknown)
                   if (!item.isUnknown) ...[
                     const SizedBox(height: 8),
                     Row(
@@ -118,6 +120,13 @@ class ScannedItemTile extends StatelessWidget {
                         _QuantityInput(
                           value: item.quantity,
                           onChanged: onQuantityChanged,
+                        ),
+                        const SizedBox(width: 6),
+
+                        // Unit selector
+                        _UnitSelector(
+                          value: item.unit,
+                          onChanged: onUnitChanged,
                         ),
                         const SizedBox(width: 8),
 
@@ -165,49 +174,97 @@ class _QuantityInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 80,
+      width: 56,
       height: 36,
       decoration: BoxDecoration(
         color: AppColors.gray50,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.gray200),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: TextEditingController(
-                text: value == value.toInt()
-                    ? value.toInt().toString()
-                    : value.toString(),
-              ),
-              keyboardType: TextInputType.number,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 8),
-              ),
-              onChanged: (v) {
-                final parsed = double.tryParse(v);
-                if (parsed != null) onChanged(parsed);
-              },
-            ),
+      child: TextField(
+        controller: TextEditingController(
+          text: value == value.toInt()
+              ? value.toInt().toString()
+              : value.toString(),
+        ),
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          isDense: true,
+        ),
+        onChanged: (v) {
+          final parsed = double.tryParse(v);
+          if (parsed != null) onChanged(parsed);
+        },
+      ),
+    );
+  }
+}
+
+/// Available units for selection
+const List<String> _availableUnits = [
+  'pcs',
+  'kg',
+  'g',
+  'L',
+  'mL',
+  'bottles',
+  'cans',
+  'bags',
+  'boxes',
+  'packs',
+];
+
+/// Unit selector dropdown
+class _UnitSelector extends StatelessWidget {
+  const _UnitSelector({
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String value;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 36,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: AppColors.gray50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _availableUnits.contains(value) ? value : 'pcs',
+          isDense: true,
+          icon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            size: 18,
+            color: AppColors.textMuted,
           ),
-          const Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: Text(
-              'Qty',
-              style: TextStyle(
-                fontSize: 10,
-                color: AppColors.textMuted,
-              ),
-            ),
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textSecondary,
           ),
-        ],
+          items: _availableUnits.map((unit) {
+            return DropdownMenuItem<String>(
+              value: unit,
+              child: Text(unit),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            if (newValue != null) onChanged(newValue);
+          },
+        ),
       ),
     );
   }

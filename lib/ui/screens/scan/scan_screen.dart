@@ -21,7 +21,11 @@ class ScanScreen extends ConsumerWidget {
         fit: StackFit.expand,
         children: [
           // Camera preview (full screen)
-          CameraPreview(isInitialized: state.isCameraInitialized),
+          CameraPreviewWidget(
+            isInitialized: state.isCameraInitialized,
+            cameraController: state.cameraController,
+            errorMessage: state.errorMessage,
+          ),
 
           // Top bar (close + flash)
           Positioned(
@@ -48,19 +52,19 @@ class ScanScreen extends ConsumerWidget {
             ),
           ),
 
-          // Loading overlay when capturing
-          if (state.isCapturing)
+          // Loading overlay when capturing or processing
+          if (state.isBusy)
             Container(
               color: Colors.black.withAlpha(128),
-              child: const Center(
+              child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircularProgressIndicator(color: Colors.white),
-                    SizedBox(height: 16),
+                    const CircularProgressIndicator(color: Colors.white),
+                    const SizedBox(height: 16),
                     Text(
-                      'Processing...',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      state.processingMessage ?? 'Processing...',
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ],
                 ),

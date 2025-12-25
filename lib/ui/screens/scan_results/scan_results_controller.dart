@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:uuid/uuid.dart';
 import '../../../config/routes.dart';
 import '../../../data/models/inventory_item.dart';
 import '../../../data/models/scanned_item.dart';
@@ -46,62 +45,72 @@ class ScanResultsState {
 
 /// Scan results controller
 class ScanResultsController extends Notifier<ScanResultsState> {
+  bool _isInitialized = false;
+
   @override
   ScanResultsState build() {
-    _loadDummyData();
     return const ScanResultsState(isLoading: true);
   }
 
   InventoryRepository get _repository => ref.read(inventoryRepositoryProvider);
 
-  /// Load dummy scan results (replace with actual AI results)
-  Future<void> _loadDummyData() async {
-    await Future.delayed(const Duration(milliseconds: 300));
+  /// Initialize with items from Gemini scan
+  void initializeWithItems(List<ScannedItem> items, {String? imagePath}) {
+    if (_isInitialized) return;
+    _isInitialized = true;
 
-    final now = DateTime.now();
-    final dummyItems = [
-      ScannedItem(
-        id: const Uuid().v4(),
-        name: 'Whole Milk',
-        category: ItemCategory.dairy,
-        quantity: 1,
-        unit: 'L',
-        expiryDate: now.add(const Duration(days: 7)),
-        isSelected: true,
-      ),
-      ScannedItem(
-        id: const Uuid().v4(),
-        name: 'Free Range Eggs',
-        category: ItemCategory.protein,
-        quantity: 12,
-        unit: 'pcs',
-        expiryDate: now.add(const Duration(days: 14)),
-        isSelected: true,
-      ),
-      ScannedItem(
-        id: const Uuid().v4(),
-        name: 'Spinach',
-        category: ItemCategory.vegetable,
-        quantity: 2,
-        unit: 'bags',
-        expiryDate: now.add(const Duration(days: 3)),
-        isSelected: false,
-      ),
-      ScannedItem(
-        id: const Uuid().v4(),
-        name: 'Unknown Item',
-        category: ItemCategory.other,
-        quantity: 1,
-        unit: 'pcs',
-        isSelected: false,
-        isUnknown: true,
-      ),
-    ];
+    debugPrint('[ScanResultsController] Initializing with ${items.length} items');
+
+    // Set default expiry dates based on category if not set
+    final processedItems = items.map((item) {
+      if (item.expiryDate == null) {
+        return item.copyWith(
+          expiryDate: DateTime.now().add(Duration(days: _getDefaultExpiryDays(item.category))),
+        );
+      }
+      return item;
+    }).toList();
 
     state = state.copyWith(
       isLoading: false,
-      items: dummyItems,
+      items: processedItems,
+      sourceImages: imagePath != null ? [imagePath] : [],
     );
+  }
+
+  /// Initialize for manual entry mode (no scanned items)
+  void initializeForManualEntry() {
+    if (_isInitialized) return;
+    _isInitialized = true;
+
+    debugPrint('[ScanResultsController] Initializing for manual entry');
+
+    state = state.copyWith(
+      isLoading: false,
+      items: [],
+    );
+  }
+
+  /// Get default expiry days based on category
+  int _getDefaultExpiryDays(ItemCategory category) {
+    switch (category) {
+      case ItemCategory.dairy:
+        return 7;
+      case ItemCategory.protein:
+        return 5;
+      case ItemCategory.vegetable:
+        return 5;
+      case ItemCategory.fruit:
+        return 7;
+      case ItemCategory.grain:
+        return 30;
+      case ItemCategory.condiment:
+        return 90;
+      case ItemCategory.beverage:
+        return 14;
+      case ItemCategory.other:
+        return 14;
+    }
   }
 
   /// Toggle item selection
@@ -121,6 +130,18 @@ class ScanResultsController extends Notifier<ScanResultsState> {
     final items = state.items.map((item) {
       if (item.id == itemId) {
         return item.copyWith(quantity: quantity);
+      }
+      return item;
+    }).toList();
+
+    state = state.copyWith(items: items);
+  }
+
+  /// Update item unit
+  void updateUnit(String itemId, String unit) {
+    final items = state.items.map((item) {
+      if (item.id == itemId) {
+        return item.copyWith(unit: unit);
       }
       return item;
     }).toList();

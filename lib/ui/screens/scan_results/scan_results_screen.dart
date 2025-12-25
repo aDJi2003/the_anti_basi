@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/app_colors.dart';
+import '../../../data/models/scanned_item.dart';
 import 'scan_results_controller.dart';
 import 'widgets/results_header.dart';
 import 'widgets/source_images.dart';
@@ -8,11 +9,50 @@ import 'widgets/scanned_item_tile.dart';
 import 'widgets/results_bottom_bar.dart';
 
 /// Screen displaying scan results with editable items
-class ScanResultsScreen extends ConsumerWidget {
-  const ScanResultsScreen({super.key});
+class ScanResultsScreen extends ConsumerStatefulWidget {
+  const ScanResultsScreen({super.key, this.extra});
+
+  final Map<String, dynamic>? extra;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ScanResultsScreen> createState() => _ScanResultsScreenState();
+}
+
+class _ScanResultsScreenState extends ConsumerState<ScanResultsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controller with data from navigation extras
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeController();
+    });
+  }
+
+  void _initializeController() {
+    final controller = ref.read(scanResultsControllerProvider.notifier);
+    final extra = widget.extra;
+
+    if (extra == null) {
+      // No extras, initialize for manual entry
+      controller.initializeForManualEntry();
+      return;
+    }
+
+    final isManualEntry = extra['isManualEntry'] as bool? ?? false;
+    if (isManualEntry) {
+      controller.initializeForManualEntry();
+      return;
+    }
+
+    // Get items from Gemini scan
+    final items = extra['items'] as List<ScannedItem>? ?? [];
+    final imagePath = extra['imagePath'] as String?;
+
+    controller.initializeWithItems(items, imagePath: imagePath);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(scanResultsControllerProvider);
     final controller = ref.read(scanResultsControllerProvider.notifier);
 
@@ -200,6 +240,8 @@ class _ResultsContent extends StatelessWidget {
                     onToggle: () => controller.toggleItem(item.id),
                     onQuantityChanged: (qty) =>
                         controller.updateQuantity(item.id, qty),
+                    onUnitChanged: (unit) =>
+                        controller.updateUnit(item.id, unit),
                     onDateTap: () =>
                         controller.updateExpiryDate(context, item.id),
                     onDelete: () => controller.deleteItem(item.id),

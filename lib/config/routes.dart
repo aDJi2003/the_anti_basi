@@ -110,7 +110,10 @@ class AppRouter {
       GoRoute(
         path: Routes.scanResults,
         name: 'scanResults',
-        builder: (context, state) => const ScanResultsScreen(),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return ScanResultsScreen(extra: extra);
+        },
       ),
     ],
   );
