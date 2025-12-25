@@ -32,9 +32,9 @@ class ProfileScreen extends ConsumerWidget {
 
                   // Avatar and user info
                   ProfileAvatar(
-                    name: state.user?.name ?? 'User',
-                    subtitle: state.user?.subtitle,
-                    avatarUrl: state.user?.avatarUrl,
+                    name: state.user?.displayName ?? 'User',
+                    subtitle: state.user?.preferences.cookingSkillDisplay,
+                    avatarUrl: state.user?.photoURL,
                     onAvatarTap: () => controller.onEditAvatar(context),
                   ),
                   const SizedBox(height: 32),
@@ -48,14 +48,14 @@ class ProfileScreen extends ConsumerWidget {
                         SettingsTile(
                           icon: Icons.badge_outlined,
                           label: 'Name',
-                          value: state.user?.name,
+                          value: state.user?.displayName,
                           onTap: () => controller.onEditName(context),
                         ),
                         SettingsTile(
                           icon: Icons.mail_outline_rounded,
                           label: 'Email',
                           value: state.user?.email,
-                          onTap: () => controller.onEditEmail(context),
+                          onTap: null, // Email is read-only
                         ),
                         SettingsTile(
                           icon: Icons.lock_outline_rounded,

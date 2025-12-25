@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/routes.dart';
 import '../../../data/models/inventory_item.dart';
 import '../../../data/repositories/inventory_repository.dart';
+import '../../../data/repositories/user_repository.dart';
 
 /// Home screen state
 class HomeState {
@@ -31,6 +31,18 @@ class HomeState {
           i.expiryStatus == ExpiryStatus.expired ||
           i.expiryStatus == ExpiryStatus.expiringToday)
       .length;
+
+  /// Get time-based greeting
+  String get greeting {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Good Morning';
+    } else if (hour < 17) {
+      return 'Good Afternoon';
+    } else {
+      return 'Good Evening';
+    }
+  }
 
   HomeState copyWith({
     bool? isLoading,
@@ -61,21 +73,23 @@ class HomeController extends Notifier<HomeState> {
     return const HomeState(isLoading: true);
   }
 
-  InventoryRepository get _repository => ref.read(inventoryRepositoryProvider);
+  InventoryRepository get _inventoryRepo => ref.read(inventoryRepositoryProvider);
+  UserRepository get _userRepo => ref.read(userRepositoryProvider);
 
   /// Load home data from Firestore
   Future<void> _loadData() async {
     try {
-      // Get current user info
-      final user = FirebaseAuth.instance.currentUser;
-      debugPrint('[HomeController] Current user: ${user?.uid}');
+      // Fetch user profile from Firestore
+      debugPrint('[HomeController] Fetching user profile...');
+      final userProfile = await _userRepo.getCurrentUser();
+      debugPrint('[HomeController] Got user: ${userProfile?.displayName}');
 
-      final userName = user?.displayName ?? user?.email?.split('@').first ?? 'User';
-      final userAvatar = user?.photoURL;
+      final userName = userProfile?.firstName ?? 'User';
+      final userAvatar = userProfile?.photoURL;
 
       // Fetch inventory from Firestore
       debugPrint('[HomeController] Fetching inventory...');
-      final allItems = await _repository.getInventory();
+      final allItems = await _inventoryRepo.getInventory();
       debugPrint('[HomeController] Got ${allItems.length} items');
 
       // Filter expiring items (within 3 days or already expired)

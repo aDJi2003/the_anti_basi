@@ -2,21 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/routes.dart';
-
-/// User profile data
-class UserProfile {
-  const UserProfile({
-    required this.name,
-    required this.email,
-    this.avatarUrl,
-    this.subtitle,
-  });
-
-  final String name;
-  final String email;
-  final String? avatarUrl;
-  final String? subtitle;
-}
+import '../../../data/models/user_profile.dart';
+import '../../../data/repositories/user_repository.dart';
 
 /// Profile screen state
 class ProfileState {
@@ -25,24 +12,28 @@ class ProfileState {
     this.user,
     this.isDarkMode = false,
     this.appVersion = 'v2.4.0 (302)',
+    this.errorMessage,
   });
 
   final bool isLoading;
   final UserProfile? user;
   final bool isDarkMode;
   final String appVersion;
+  final String? errorMessage;
 
   ProfileState copyWith({
     bool? isLoading,
     UserProfile? user,
     bool? isDarkMode,
     String? appVersion,
+    String? errorMessage,
   }) {
     return ProfileState(
       isLoading: isLoading ?? this.isLoading,
       user: user ?? this.user,
       isDarkMode: isDarkMode ?? this.isDarkMode,
       appVersion: appVersion ?? this.appVersion,
+      errorMessage: errorMessage,
     );
   }
 }
@@ -55,25 +46,32 @@ class ProfileController extends Notifier<ProfileState> {
     return const ProfileState(isLoading: true);
   }
 
-  /// Load user profile data
+  UserRepository get _userRepo => ref.read(userRepositoryProvider);
+
+  /// Load user profile from Firestore
   Future<void> _loadProfile() async {
     try {
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      // Dummy user data
-      const user = UserProfile(
-        name: 'Budi',
-        email: 'budi@student.edu',
-        subtitle: 'Student • Food Saver',
-      );
+      debugPrint('[ProfileController] Fetching user profile...');
+      final userProfile = await _userRepo.getCurrentUser();
+      debugPrint('[ProfileController] Got user: ${userProfile?.displayName}');
 
       state = state.copyWith(
         isLoading: false,
-        user: user,
+        user: userProfile,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false);
+      debugPrint('[ProfileController] ERROR: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      );
     }
+  }
+
+  /// Refresh profile data
+  Future<void> refresh() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    await _loadProfile();
   }
 
   /// Toggle dark mode
@@ -92,9 +90,18 @@ class ProfileController extends Notifier<ProfileState> {
     _showSnackBar(context, 'Edit email coming soon');
   }
 
-  /// Change password
-  void onChangePassword(BuildContext context) {
-    _showSnackBar(context, 'Change password coming soon');
+  /// Change password - sends password reset email
+  Future<void> onChangePassword(BuildContext context) async {
+    try {
+      await _userRepo.sendPasswordResetEmail();
+      if (context.mounted) {
+        _showSnackBar(context, 'Password reset email sent');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        _showSnackBar(context, 'Failed to send reset email: $e');
+      }
+    }
   }
 
   /// Log out
@@ -122,8 +129,10 @@ class ProfileController extends Notifier<ProfileState> {
     );
 
     if (confirmed == true && context.mounted) {
-      // TODO: Clear auth state
-      context.go(Routes.login);
+      await _userRepo.signOut();
+      if (context.mounted) {
+        context.go(Routes.login);
+      }
     }
   }
 
