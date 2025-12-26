@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user_profile.dart';
 
 /// Repository for user profile Firestore operations
@@ -156,9 +157,32 @@ class UserRepository {
     }
   }
 
-  /// Sign out
+  /// Sign out from Firebase Auth and Google Sign-In
   Future<void> signOut() async {
-    await _auth.signOut();
+    try {
+      // Disconnect from Google (allows picking different account next time)
+      final googleSignIn = GoogleSignIn();
+      try {
+        await googleSignIn.disconnect();
+        debugPrint('[UserRepo] Disconnected from Google');
+      } catch (e) {
+        // If disconnect fails, try signOut
+        try {
+          await googleSignIn.signOut();
+          debugPrint('[UserRepo] Signed out from Google');
+        } catch (_) {
+          debugPrint('[UserRepo] Google was not signed in');
+        }
+      }
+
+      // Sign out from Firebase Auth
+      await _auth.signOut();
+      debugPrint('[UserRepo] Signed out from Firebase Auth');
+    } catch (e) {
+      debugPrint('[UserRepo] ERROR during sign out: $e');
+      // Still try to sign out from Firebase even if Google sign out fails
+      await _auth.signOut();
+    }
   }
 }
 
