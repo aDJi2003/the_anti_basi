@@ -25,54 +25,14 @@ class ScannedItem {
   final double confidence; // AI detection confidence 0-1
   final bool isUnknown; // Could not detect details
 
-  /// Get icon for category
-  IconData get categoryIcon {
-    switch (category) {
-      case ItemCategory.dairy:
-        return Icons.local_drink_outlined;
-      case ItemCategory.protein:
-        return Icons.egg_outlined;
-      case ItemCategory.vegetable:
-        return Icons.grass_outlined;
-      case ItemCategory.fruit:
-        return Icons.apple;
-      case ItemCategory.grain:
-        return Icons.bakery_dining_outlined;
-      case ItemCategory.condiment:
-        return Icons.local_dining_outlined;
-      case ItemCategory.beverage:
-        return Icons.local_cafe_outlined;
-      case ItemCategory.other:
-        return Icons.bubble_chart_outlined;
-    }
-  }
+  /// Get icon for category - uses ItemCategory enum as single source of truth
+  IconData get categoryIcon => category.icon;
 
-  /// Get color for category
-  Color get categoryColor {
-    switch (category) {
-      case ItemCategory.dairy:
-        return const Color(0xFF3B82F6); // blue
-      case ItemCategory.protein:
-        return const Color(0xFFEAB308); // yellow
-      case ItemCategory.vegetable:
-        return const Color(0xFF22C55E); // green
-      case ItemCategory.fruit:
-        return const Color(0xFFF97316); // orange
-      case ItemCategory.grain:
-        return const Color(0xFFA855F7); // purple
-      case ItemCategory.condiment:
-        return const Color(0xFFEC4899); // pink
-      case ItemCategory.beverage:
-        return const Color(0xFF06B6D4); // cyan
-      case ItemCategory.other:
-        return const Color(0xFF8B5CF6); // violet
-    }
-  }
+  /// Get color for category - uses ItemCategory enum as single source of truth
+  Color get categoryColor => category.color;
 
-  /// Get background color for category icon
-  Color get categoryBgColor {
-    return categoryColor.withAlpha(26); // 10% opacity
-  }
+  /// Get background color for category icon - uses ItemCategory enum
+  Color get categoryBgColor => category.lightColor;
 
   /// Convert to InventoryItem for saving
   InventoryItem toInventoryItem({String? displayName}) {

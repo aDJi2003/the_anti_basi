@@ -27,14 +27,14 @@ enum ItemCategory {
 
   IconData get icon {
     return switch (this) {
-      ItemCategory.dairy => Icons.local_drink_outlined,
-      ItemCategory.protein => Icons.egg_outlined,
-      ItemCategory.vegetable => Icons.eco_outlined,
-      ItemCategory.fruit => Icons.apple,
-      ItemCategory.grain => Icons.bakery_dining_outlined,
-      ItemCategory.condiment => Icons.water_drop_outlined,
-      ItemCategory.beverage => Icons.local_cafe_outlined,
-      ItemCategory.other => Icons.inventory_2_outlined,
+      ItemCategory.dairy => Icons.local_drink_outlined, // Milk/dairy products
+      ItemCategory.protein => Icons.egg_outlined, // Eggs, meat, tofu
+      ItemCategory.vegetable => Icons.eco_outlined, // Vegetables/greens
+      ItemCategory.fruit => Icons.apple, // Fruits
+      ItemCategory.grain => Icons.bakery_dining_outlined, // Bread, rice, pasta
+      ItemCategory.condiment => Icons.local_dining_outlined, // Sauces, spices
+      ItemCategory.beverage => Icons.local_cafe_outlined, // Drinks
+      ItemCategory.other => Icons.inventory_2_outlined, // Misc items
     };
   }
 

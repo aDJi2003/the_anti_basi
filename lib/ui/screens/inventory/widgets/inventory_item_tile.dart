@@ -17,7 +17,6 @@ class InventoryItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final statusColor = _getStatusColor(item.expiryStatus);
-    final statusBgColor = _getStatusBgColor(item.expiryStatus);
 
     return GestureDetector(
       onTap: onTap,
@@ -30,17 +29,17 @@ class InventoryItemTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Category icon
+            // Category icon - uses ItemCategory enum for consistency
             Container(
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: statusBgColor,
+                color: item.category.lightColor,
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                _getCategoryIcon(item.category),
-                color: statusColor,
+                item.category.icon,
+                color: item.category.color,
                 size: 20,
               ),
             ),
@@ -106,40 +105,6 @@ class InventoryItemTile extends StatelessWidget {
         return AppColors.warning;
       case ExpiryStatus.fresh:
         return AppColors.success;
-    }
-  }
-
-  Color _getStatusBgColor(ExpiryStatus status) {
-    switch (status) {
-      case ExpiryStatus.expired:
-        return AppColors.errorLight;
-      case ExpiryStatus.expiringToday:
-        return AppColors.errorLight;
-      case ExpiryStatus.expiringSoon:
-        return AppColors.warningLight;
-      case ExpiryStatus.fresh:
-        return AppColors.primaryLight;
-    }
-  }
-
-  IconData _getCategoryIcon(ItemCategory category) {
-    switch (category) {
-      case ItemCategory.dairy:
-        return Icons.water_drop_outlined;
-      case ItemCategory.protein:
-        return Icons.restaurant_outlined;
-      case ItemCategory.vegetable:
-        return Icons.grass_outlined;
-      case ItemCategory.fruit:
-        return Icons.apple;
-      case ItemCategory.grain:
-        return Icons.bakery_dining_outlined;
-      case ItemCategory.condiment:
-        return Icons.local_dining_outlined;
-      case ItemCategory.beverage:
-        return Icons.local_cafe_outlined;
-      case ItemCategory.other:
-        return Icons.inventory_2_outlined;
     }
   }
 
