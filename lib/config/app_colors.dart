@@ -21,6 +21,16 @@ class AppColors {
   static const Color success = Color(0xFF10B981);
   static const Color saved = Color(0xFF8B5CF6);
 
+  // Extended Accent Colors
+  static const Color purple = Color(0xFF8B5CF6);
+  static const Color purpleLight = Color(0xFFF3E8FF);
+  static const Color blue = Color(0xFF3B82F6);
+  static const Color blueLight = Color(0xFFEFF6FF);
+  static const Color orange = Color(0xFFF97316);
+  static const Color orangeLight = Color(0xFFFFF7ED);
+  static const Color teal = Color(0xFF14B8A6);
+  static const Color tealLight = Color(0xFFF0FDFA);
+
   // Neutral Colors
   static const Color white = Color(0xFFFFFFFF);
   static const Color background = Color(0xFFF9FAFB);

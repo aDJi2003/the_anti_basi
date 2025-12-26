@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/app_colors.dart';
 import '../../../data/models/recipe.dart';
 import '../../../data/models/recipe_ingredient_display.dart';
+import '../../widgets/common/notification_button.dart';
 import 'recipe_controller.dart';
 
 /// Recipe screen - Shows saved recipes with generate option
@@ -46,11 +47,11 @@ class RecipeSuggestionScreen extends ConsumerWidget {
                             Icon(
                               Icons.bookmark_rounded,
                               size: 18,
-                              color: AppColors.primary,
+                              color: AppColors.purple,
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'RESEP TERSIMPAN',
+                              'SAVED RECIPES',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -60,7 +61,7 @@ class RecipeSuggestionScreen extends ConsumerWidget {
                             ),
                             const Spacer(),
                             Text(
-                              '${state.savedRecipes.length} resep',
+                              '${state.savedRecipes.length} recipes',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textMuted,
@@ -111,15 +112,15 @@ class RecipeSuggestionScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Hapus Resep?'),
-        content: Text('Yakin ingin menghapus "${recipe.name}"?'),
+        title: const Text('Delete Recipe?'),
+        content: Text('Are you sure you want to delete "${recipe.name}"?'),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
+            child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () {
@@ -129,7 +130,7 @@ class RecipeSuggestionScreen extends ConsumerWidget {
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.error,
             ),
-            child: const Text('Hapus'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -137,7 +138,7 @@ class RecipeSuggestionScreen extends ConsumerWidget {
   }
 }
 
-/// Header with title
+/// Header with title and notification icon
 class _RecipeHeader extends StatelessWidget {
   const _RecipeHeader();
 
@@ -154,14 +155,14 @@ class _RecipeHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Mau masak',
+                  'What will you',
                   style: theme.textTheme.titleLarge?.copyWith(
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
                 Text(
-                  'apa hari ini?',
+                  'cook today?',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
@@ -170,13 +171,15 @@ class _RecipeHeader extends StatelessWidget {
               ],
             ),
           ),
+          // Notification button (shared widget)
+          const NotificationButton(),
         ],
       ),
     );
   }
 }
 
-/// Generate recipes CTA card
+/// Generate recipes CTA card - Clean design with circular decorations
 class _GenerateCtaCard extends StatelessWidget {
   const _GenerateCtaCard({
     required this.expiringCount,
@@ -195,131 +198,150 @@ class _GenerateCtaCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.primary,
-              AppColors.primary.withBlue(200),
-            ],
-          ),
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.gray200),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withAlpha(77),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
+              color: Colors.black.withAlpha(13),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            // Icon and title row
-            Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(51),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.auto_awesome_rounded,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Mau resep baru?',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Generate resep dari bahan di kulkasmu',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withAlpha(204),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            // Expiring items warning
-            if (expiringCount > 0)
-              Padding(
-                padding: const EdgeInsets.only(top: 12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(51),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.warning_amber_rounded,
-                        size: 16,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '$expiringCount bahan segera expired',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
+            // Decorative circles
+            Positioned(
+              top: -30,
+              right: -30,
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primaryLight,
                 ),
               ),
+            ),
+            Positioned(
+              top: 20,
+              right: 30,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.tealLight,
+                ),
+              ),
+            ),
 
-            const SizedBox(height: 16),
+            // Content
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Icon badge
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.auto_awesome_rounded,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
 
-            // Generate button
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: FilledButton.icon(
-                onPressed: isGenerating ? null : onGenerate,
-                icon: isGenerating
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.primary,
+                  // Title and subtitle
+                  Text(
+                    'Need recipe ideas?',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Generate recipes based on your fridge items',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+
+                  // Expiring items badge - separate visual element
+                  if (expiringCount > 0) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: AppColors.orangeLight,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.schedule_rounded,
+                            size: 18,
+                            color: AppColors.orange,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '$expiringCount item${expiringCount > 1 ? 's' : ''} expiring soon',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.orange,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: 20),
+
+                  // Generate button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: FilledButton.icon(
+                      onPressed: isGenerating ? null : onGenerate,
+                      icon: isGenerating
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.restaurant_menu_rounded),
+                      label: Text(
+                        isGenerating ? 'Generating...' : 'Generate recipes',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
-                      )
-                    : const Icon(Icons.restaurant_menu_rounded),
-                label: Text(
-                  isGenerating ? 'Generating...' : 'Generate Recipes',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+                      ),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+                ],
               ),
             ),
           ],
@@ -366,17 +388,17 @@ class _SavedRecipeCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Recipe icon
+                  // Recipe icon - using purple for saved
                   Container(
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withAlpha(26),
+                      color: AppColors.purpleLight,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       Icons.restaurant_rounded,
-                      color: AppColors.primary,
+                      color: AppColors.purple,
                       size: 24,
                     ),
                   ),
@@ -475,7 +497,7 @@ class _SavedRecipeCard extends StatelessWidget {
   }
 }
 
-/// Ingredient status badges (missing, expiring)
+/// Ingredient status badges - using varied colors
 class _IngredientStatusBadges extends StatelessWidget {
   const _IngredientStatusBadges({required this.summary});
 
@@ -489,25 +511,25 @@ class _IngredientStatusBadges extends StatelessWidget {
       spacing: 8,
       runSpacing: 4,
       children: [
-        // In stock
+        // In stock - using teal
         if (summary.available > 0)
           _buildBadge(
             icon: Icons.check_circle_rounded,
-            text: '${summary.available}/${summary.total}',
-            color: AppColors.success,
+            text: '${summary.available}/${summary.total} ready',
+            color: AppColors.teal,
             theme: theme,
           ),
 
-        // Expiring soon
+        // Expiring soon - using orange
         if (summary.expiringSoon > 0)
           _buildBadge(
-            icon: Icons.warning_rounded,
-            text: '${summary.expiringSoon} exp',
-            color: AppColors.warning,
+            icon: Icons.schedule_rounded,
+            text: '${summary.expiringSoon} expiring',
+            color: AppColors.orange,
             theme: theme,
           ),
 
-        // Missing
+        // Missing - using gray
         if (summary.missing > 0)
           _buildBadge(
             icon: Icons.help_outline_rounded,
@@ -567,18 +589,18 @@ class _EmptySavedState extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.gray100,
+                color: AppColors.purpleLight,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.bookmark_border_rounded,
-                color: AppColors.gray400,
+                color: AppColors.purple,
                 size: 40,
               ),
             ),
             const SizedBox(height: 24),
             Text(
-              'Belum Ada Resep',
+              'No Saved Recipes',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -586,7 +608,7 @@ class _EmptySavedState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Generate resep dari bahan yang ada di kulkasmu untuk memulai',
+              'Generate recipes from your fridge items to get started',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppColors.textSecondary,
               ),

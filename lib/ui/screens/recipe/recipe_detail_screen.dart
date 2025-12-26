@@ -134,7 +134,7 @@ class RecipeDetailScreen extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
                     child: _SectionHeader(
-                      title: 'Bahan-bahan',
+                      title: 'Ingredients',
                       trailing: _IngredientSummaryChip(summary: summary),
                     ),
                   ),
@@ -152,7 +152,7 @@ class RecipeDetailScreen extends ConsumerWidget {
                   // Instructions section
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: _SectionHeader(title: 'Langkah-langkah'),
+                    child: _SectionHeader(title: 'Instructions'),
                   ),
                   const SizedBox(height: 16),
                   Padding(
@@ -239,7 +239,7 @@ class _WarningBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Perhatian',
+                    'Attention',
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: hasExpired ? AppColors.error : AppColors.warning,
@@ -264,8 +264,8 @@ class _WarningBanner extends StatelessWidget {
 
   String _buildMessage(bool hasExpired, bool hasMissing, IngredientSummary summary) {
     final parts = <String>[];
-    if (hasExpired) parts.add('${summary.expired} bahan expired');
-    if (hasMissing) parts.add('${summary.missing} bahan tidak tersedia');
+    if (hasExpired) parts.add('${summary.expired} expired');
+    if (hasMissing) parts.add('${summary.missing} missing');
     return parts.join(' • ');
   }
 }
@@ -420,7 +420,7 @@ class _IngredientSummaryChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        '${summary.available}/${summary.total} tersedia',
+        '${summary.available}/${summary.total} available',
         style: theme.textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w600,
           color: color,
@@ -485,8 +485,8 @@ class _StartCookingButton extends StatelessWidget {
             SnackBar(
               content: Text(
                 canCook
-                    ? 'Selamat memasak!'
-                    : 'Beberapa bahan belum tersedia',
+                    ? 'Happy cooking!'
+                    : 'Some ingredients are missing',
               ),
               backgroundColor: canCook ? AppColors.success : AppColors.warning,
               behavior: SnackBarBehavior.floating,
@@ -503,8 +503,8 @@ class _StartCookingButton extends StatelessWidget {
         ),
         label: Text(
           canCook
-              ? 'Mulai Masak'
-              : 'Mulai Masak (${expiredCount + missingCount} bahan kurang)',
+              ? 'Start Cooking'
+              : 'Start Cooking (${expiredCount + missingCount} missing)',
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
             color: Colors.white,

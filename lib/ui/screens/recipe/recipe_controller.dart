@@ -129,7 +129,7 @@ class RecipeController extends Notifier<RecipeState> {
   /// Generate recipes using Gemini AI
   Future<void> generateRecipes(BuildContext context) async {
     if (state.inventory.isEmpty) {
-      _showSnackBar(context, 'Tambahkan bahan ke inventory dulu', isError: true);
+      _showSnackBar(context, 'Add ingredients to inventory first', isError: true);
       return;
     }
 
@@ -143,7 +143,7 @@ class RecipeController extends Notifier<RecipeState> {
       if (recipes.isEmpty) {
         state = state.copyWith(isGenerating: false);
         if (context.mounted) {
-          _showSnackBar(context, 'Tidak dapat generate resep. Coba lagi.', isError: true);
+          _showSnackBar(context, 'Could not generate recipes. Try again.', isError: true);
         }
         return;
       }
@@ -166,7 +166,7 @@ class RecipeController extends Notifier<RecipeState> {
         error: 'Failed to generate recipes',
       );
       if (context.mounted) {
-        _showSnackBar(context, 'Gagal generate resep: $e', isError: true);
+        _showSnackBar(context, 'Failed to generate recipes: $e', isError: true);
       }
     }
   }
@@ -190,7 +190,7 @@ class RecipeController extends Notifier<RecipeState> {
         .toList();
 
     if (selectedRecipes.isEmpty) {
-      _showSnackBar(context, 'Pilih minimal 1 resep untuk disimpan', isError: true);
+      _showSnackBar(context, 'Select at least 1 recipe to save', isError: true);
       return;
     }
 
@@ -208,13 +208,13 @@ class RecipeController extends Notifier<RecipeState> {
       );
 
       if (context.mounted) {
-        _showSnackBar(context, '${selectedRecipes.length} resep disimpan!');
+        _showSnackBar(context, '${selectedRecipes.length} recipe${selectedRecipes.length > 1 ? 's' : ''} saved!');
         context.pop(); // Go back to recipe screen
       }
     } catch (e) {
       debugPrint('[RecipeController] ERROR saving recipes: $e');
       if (context.mounted) {
-        _showSnackBar(context, 'Gagal menyimpan resep', isError: true);
+        _showSnackBar(context, 'Failed to save recipes', isError: true);
       }
     }
   }
@@ -231,12 +231,12 @@ class RecipeController extends Notifier<RecipeState> {
       state = state.copyWith(savedRecipes: updatedRecipes);
 
       if (context.mounted) {
-        _showSnackBar(context, 'Resep dihapus');
+        _showSnackBar(context, 'Recipe deleted');
       }
     } catch (e) {
       debugPrint('[RecipeController] ERROR deleting recipe: $e');
       if (context.mounted) {
-        _showSnackBar(context, 'Gagal menghapus resep', isError: true);
+        _showSnackBar(context, 'Failed to delete recipe', isError: true);
       }
     }
   }

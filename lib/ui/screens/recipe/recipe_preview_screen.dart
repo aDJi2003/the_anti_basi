@@ -95,14 +95,14 @@ class _PreviewHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hasil Generate',
+                  'Generated Recipes',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
                 Text(
-                  '$selectedCount/$totalCount resep dipilih',
+                  '$selectedCount of $totalCount selected',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -145,7 +145,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Tidak Ada Resep',
+              'No Recipes Found',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -153,7 +153,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Tidak dapat menemukan resep untuk bahan yang tersedia',
+              'Could not find recipes for your available ingredients',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppColors.textSecondary,
               ),
@@ -186,17 +186,17 @@ class _PreviewContent extends StatelessWidget {
 
     return CustomScrollView(
       slivers: [
-        // AI Info banner
+        // AI Info banner - using blue
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.primary.withAlpha(26),
+                color: AppColors.blueLight,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColors.primary.withAlpha(51),
+                  color: AppColors.blue.withAlpha(51),
                 ),
               ),
               child: Row(
@@ -205,12 +205,12 @@ class _PreviewContent extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withAlpha(38),
+                      color: AppColors.blue.withAlpha(38),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.auto_awesome_rounded,
-                      color: AppColors.primary,
+                      color: AppColors.blue,
                       size: 20,
                     ),
                   ),
@@ -220,16 +220,16 @@ class _PreviewContent extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'AI menemukan ${recipes.length} resep',
+                          'AI found ${recipes.length} recipes',
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
+                            color: AppColors.blue,
                           ),
                         ),
                         Text(
-                          'Berdasarkan bahan di kulkasmu',
+                          'Based on your fridge ingredients',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.primary.withAlpha(179),
+                            color: AppColors.blue.withAlpha(179),
                           ),
                         ),
                       ],
@@ -241,7 +241,7 @@ class _PreviewContent extends StatelessWidget {
           ),
         ),
 
-        // Expiring items warning
+        // Expiring items warning - using orange
         if (expiringItemNames.isNotEmpty)
           SliverToBoxAdapter(
             child: Padding(
@@ -249,25 +249,25 @@ class _PreviewContent extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withAlpha(26),
+                  color: AppColors.orangeLight,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: AppColors.warning.withAlpha(51),
+                    color: AppColors.orange.withAlpha(51),
                   ),
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      Icons.warning_amber_rounded,
-                      color: AppColors.warning,
+                      Icons.schedule_rounded,
+                      color: AppColors.orange,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Prioritas: ${expiringItemNames.join(", ")} (segera expired)',
+                        'Priority: ${expiringItemNames.join(", ")} (expiring soon)',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.warning,
+                          color: AppColors.orange,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -283,7 +283,7 @@ class _PreviewContent extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
             child: Text(
-              'PILIH RESEP UNTUK DISIMPAN',
+              'SELECT RECIPES TO SAVE',
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.textMuted,
@@ -315,7 +315,7 @@ class _PreviewContent extends StatelessWidget {
   }
 }
 
-/// Recipe tile with checkbox for selection
+/// Recipe tile with checkbox for selection - using purple accent
 class _GeneratedRecipeTile extends StatelessWidget {
   const _GeneratedRecipeTile({
     required this.recipe,
@@ -342,7 +342,7 @@ class _GeneratedRecipeTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: recipe.isSelected
-                  ? AppColors.primary.withAlpha(128)
+                  ? AppColors.purple.withAlpha(128)
                   : AppColors.gray200,
               width: recipe.isSelected ? 2 : 1,
             ),
@@ -355,7 +355,7 @@ class _GeneratedRecipeTile extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Checkbox
+                  // Checkbox - using purple
                   GestureDetector(
                     onTap: onToggle,
                     child: Container(
@@ -363,12 +363,12 @@ class _GeneratedRecipeTile extends StatelessWidget {
                       height: 24,
                       decoration: BoxDecoration(
                         color: recipe.isSelected
-                            ? AppColors.primary
+                            ? AppColors.purple
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
                           color: recipe.isSelected
-                              ? AppColors.primary
+                              ? AppColors.purple
                               : AppColors.gray300,
                           width: 2,
                         ),
@@ -436,7 +436,7 @@ class _GeneratedRecipeTile extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
 
-                        // Using expiring items
+                        // Using expiring items - using teal
                         if (recipe.usesExpiringItems.isNotEmpty)
                           Wrap(
                             spacing: 6,
@@ -455,7 +455,7 @@ class _GeneratedRecipeTile extends StatelessWidget {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.success.withAlpha(26),
+                                    color: AppColors.tealLight,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Row(
@@ -464,13 +464,13 @@ class _GeneratedRecipeTile extends StatelessWidget {
                                       Icon(
                                         Icons.check_rounded,
                                         size: 12,
-                                        color: AppColors.success,
+                                        color: AppColors.teal,
                                       ),
                                       const SizedBox(width: 2),
                                       Text(
                                         item,
                                         style: theme.textTheme.labelSmall?.copyWith(
-                                          color: AppColors.success,
+                                          color: AppColors.teal,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -499,7 +499,7 @@ class _GeneratedRecipeTile extends StatelessWidget {
   }
 }
 
-/// Bottom bar with save button
+/// Bottom bar with save button - using purple
 class _PreviewBottomBar extends StatelessWidget {
   const _PreviewBottomBar({
     required this.selectedCount,
@@ -546,13 +546,13 @@ class _PreviewBottomBar extends StatelessWidget {
                   Icon(
                     Icons.check_circle_rounded,
                     size: 16,
-                    color: AppColors.success,
+                    color: AppColors.purple,
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '$selectedCount resep dipilih',
+                    '$selectedCount recipe${selectedCount > 1 ? 's' : ''} selected',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.success,
+                      color: AppColors.purple,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -578,10 +578,10 @@ class _PreviewBottomBar extends StatelessWidget {
                   : const Icon(Icons.bookmark_add_rounded),
               label: Text(
                 isLoading
-                    ? 'Menyimpan...'
+                    ? 'Saving...'
                     : hasSelection
-                        ? 'Simpan Resep Terpilih'
-                        : 'Pilih Resep untuk Disimpan',
+                        ? 'Save Selected Recipes'
+                        : 'Select Recipes to Save',
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: hasSelection ? AppColors.white : AppColors.textMuted,
@@ -589,7 +589,7 @@ class _PreviewBottomBar extends StatelessWidget {
               ),
               style: FilledButton.styleFrom(
                 backgroundColor:
-                    hasSelection ? AppColors.primary : AppColors.gray200,
+                    hasSelection ? AppColors.purple : AppColors.gray200,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

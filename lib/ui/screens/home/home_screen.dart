@@ -1,36 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:the_anti_basi/config/app_colors.dart';
+import 'package:the_anti_basi/ui/screens/recipe/recipe_controller.dart';
 import 'package:the_anti_basi/ui/screens/recipe/widgets/recipe_suggestion.dart';
 import 'home_controller.dart';
-import 'widgets/ai_assistant_card.dart';
 import 'widgets/attention_banner.dart';
 import 'widgets/expiring_soon_section.dart';
 import 'widgets/fridge_card.dart';
 import 'widgets/home_header.dart';
+import 'widgets/recipe_cta_card.dart';
 
 /// Home screen - Main dashboard
 /// Note: Bottom nav bar is handled by MainShell (like layout.tsx in React)
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  final _aiController = TextEditingController();
-
-  @override
-  void dispose() {
-    _aiController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(homeControllerProvider);
     final controller = ref.read(homeControllerProvider.notifier);
+    final recipeController = ref.read(recipeControllerProvider.notifier);
+    final recipeState = ref.watch(recipeControllerProvider);
 
     return SafeArea(
       bottom: false,
@@ -69,14 +59,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 24)),
 
-                  // AI Assistant
+                  // Recipe CTA - Psychological trigger for generating recipes
                   SliverToBoxAdapter(
-                    child: AiAssistantCard(
-                      controller: _aiController,
-                      onSubmit: (query) {
-                        controller.onAiQuery(query, context);
-                        _aiController.clear();
-                      },
+                    child: RecipeCtaCard(
+                      expiringItems: state.expiringItems,
+                      onGenerateRecipes: recipeState.isGenerating
+                          ? () {} // Disable while generating
+                          : () => recipeController.generateRecipes(context),
                     ),
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 24)),
