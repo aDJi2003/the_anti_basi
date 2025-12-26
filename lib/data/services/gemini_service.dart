@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:uuid/uuid.dart';
 import '../models/inventory_item.dart';
+import '../models/recipe.dart';
 import '../models/scanned_item.dart';
 
 /// Service for Gemini AI image processing
@@ -277,6 +278,143 @@ If no food detected, return: {"items": []}
         return 'image/webp';
       default:
         return 'image/jpeg';
+    }
+  }
+
+  // ============ RECIPE GENERATION ============
+
+  /// Generate recipes based on inventory items
+  Future<List<Recipe>> generateRecipes(List<InventoryItem> inventory) async {
+    if (_model == null) {
+      debugPrint('[GeminiService] Model not initialized, returning empty list');
+      return [];
+    }
+
+    if (inventory.isEmpty) {
+      debugPrint('[GeminiService] No inventory items, returning empty list');
+      return [];
+    }
+
+    try {
+      debugPrint('[GeminiService] Generating recipes for ${inventory.length} items');
+
+      // Build inventory list string
+      final inventoryList = inventory
+          .map((i) => "${i.name} (${i.quantity} ${i.unit}, exp: ${i.daysUntilExpiry} hari)")
+          .join(", ");
+
+      // Get expiring items (within 3 days)
+      final expiringItems = inventory
+          .where((i) => i.daysUntilExpiry <= 3 && i.daysUntilExpiry >= 0)
+          .map((i) => i.name)
+          .toList();
+
+      final expiringList = expiringItems.isNotEmpty
+          ? expiringItems.join(", ")
+          : "Tidak ada yang segera expired";
+
+      debugPrint('[GeminiService] Expiring items: $expiringList');
+
+      // Build prompt
+      final prompt = _buildRecipePrompt(inventoryList, expiringList);
+
+      // Send to Gemini
+      final content = [Content.text(prompt)];
+
+      debugPrint('[GeminiService] Sending recipe request to Gemini...');
+      final response = await _model!.generateContent(content);
+      final responseText = response.text;
+
+      debugPrint('[GeminiService] Recipe response: $responseText');
+
+      if (responseText == null || responseText.isEmpty) {
+        debugPrint('[GeminiService] Empty response from Gemini');
+        return [];
+      }
+
+      // Parse JSON response
+      return _parseRecipeResponse(responseText, expiringItems);
+    } catch (e, stack) {
+      debugPrint('[GeminiService] ERROR generating recipes: $e');
+      debugPrint('[GeminiService] Stack: $stack');
+      return [];
+    }
+  }
+
+  /// Build recipe generation prompt
+  String _buildRecipePrompt(String inventoryList, String expiringList) {
+    return '''
+Kamu adalah chef Indonesia yang membantu mahasiswa kos memasak dengan bahan yang ada.
+
+BAHAN DI KULKAS:
+$inventoryList
+
+PRIORITAS (HARUS SEGERA DIPAKAI):
+$expiringList
+
+Berikan 3 resep yang:
+1. Menggunakan bahan yang ada (terutama yang expiring)
+2. Mudah dibuat (max 30 menit, peralatan sederhana)
+3. Cocok untuk 1-2 porsi (anak kos)
+4. Resep Indonesia atau fusion yang familiar
+
+FORMAT JSON (HANYA JSON, tanpa penjelasan):
+{
+  "recipes": [
+    {
+      "name": "Nama Resep",
+      "description": "Deskripsi singkat dalam 1 kalimat",
+      "cookTime": 15,
+      "difficulty": "easy",
+      "servings": 2,
+      "usesExpiringItems": ["tomat", "tahu"],
+      "ingredients": [
+        {"name": "tomat", "quantity": "2 buah"},
+        {"name": "tahu", "quantity": "1 kotak"},
+        {"name": "garam", "quantity": "secukupnya"}
+      ],
+      "instructions": [
+        {"stepNumber": 1, "title": "Siapkan Bahan", "description": "Potong tahu dan tomat menjadi dadu kecil"},
+        {"stepNumber": 2, "title": "Tumis", "description": "Panaskan minyak, tumis bawang hingga harum"},
+        {"stepNumber": 3, "title": "Masak", "description": "Masukkan tahu dan tomat, aduk rata, tambahkan garam"}
+      ],
+      "proTip": "Tips memasak singkat (opsional)"
+    }
+  ]
+}
+
+RULES:
+- difficulty: "easy" (< 15 min), "medium" (15-25 min), "hard" (> 25 min)
+- usesExpiringItems hanya diisi dengan bahan dari daftar PRIORITAS
+- ingredients harus realistis untuk mahasiswa kos
+- instructions maksimal 5 langkah, jelas dan singkat
+''';
+  }
+
+  /// Parse recipe response from Gemini
+  List<Recipe> _parseRecipeResponse(String jsonString, List<String> expiringItems) {
+    try {
+      // Clean up JSON string
+      var cleanJson = jsonString.trim();
+      if (cleanJson.contains('```')) {
+        cleanJson = cleanJson
+            .replaceAll('```json', '')
+            .replaceAll('```', '')
+            .trim();
+      }
+
+      final Map<String, dynamic> data = jsonDecode(cleanJson);
+      final List<dynamic> recipesJson = data['recipes'] ?? [];
+
+      debugPrint('[GeminiService] Parsed ${recipesJson.length} recipes');
+
+      return recipesJson.map((json) {
+        final id = const Uuid().v4();
+        return Recipe.fromGeminiJson(json as Map<String, dynamic>, id);
+      }).toList();
+    } catch (e) {
+      debugPrint('[GeminiService] ERROR parsing recipe response: $e');
+      return [];
     }
   }
 }

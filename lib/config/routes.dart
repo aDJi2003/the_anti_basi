@@ -10,6 +10,7 @@ import '../ui/screens/scan_results/scan_results_screen.dart';
 import '../ui/screens/splash/splash_screen.dart';
 import '../ui/screens/recipe/recipe_suggestion_screen.dart';
 import '../ui/screens/recipe/recipe_detail_screen.dart';
+import '../ui/screens/recipe/recipe_preview_screen.dart';
 import '../ui/screens/settings/settings_screen.dart';
 
 /// Route names
@@ -25,6 +26,7 @@ class Routes {
   static const String inventory = '/inventory';
   static const String recipes = '/recipes';
   static const String recipeDetail = '/recipes/detail/:id';
+  static const String recipePreview = '/recipe-preview';
   static const String profile = '/profile';
   static const String settings = '/settings';
 }
@@ -114,6 +116,11 @@ class AppRouter {
           final extra = state.extra as Map<String, dynamic>?;
           return ScanResultsScreen(extra: extra);
         },
+      ),
+      GoRoute(
+        path: Routes.recipePreview,
+        name: 'recipePreview',
+        builder: (context, state) => const RecipePreviewScreen(),
       ),
     ],
   );

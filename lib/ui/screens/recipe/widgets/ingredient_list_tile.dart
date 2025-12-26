@@ -1,47 +1,48 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
-import '../../../../data/models/recipe.dart';
+import '../../../../data/models/recipe_ingredient_display.dart';
 
-/// Ingredient tile for recipe detail
+/// Ingredient tile for recipe detail with dynamic validation status
 class IngredientListTile extends StatelessWidget {
   const IngredientListTile({
     super.key,
     required this.ingredient,
-    this.onAddTap,
   });
 
-  final RecipeIngredient ingredient;
-  final VoidCallback? onAddTap;
+  final RecipeIngredientDisplay ingredient;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: ingredient.status.bgColor,
         borderRadius: BorderRadius.circular(12),
-        border: ingredient.isInStock
-            ? null
-            : Border.all(color: AppColors.lightGrey),
+        border: Border.all(
+          color: ingredient.status.color.withAlpha(51),
+        ),
       ),
       child: Row(
         children: [
-          // Ingredient icon placeholder
+          // Status icon
           Container(
-            width: 40,
-            height: 40,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: AppColors.lightGrey,
-              borderRadius: BorderRadius.circular(10),
+              color: ingredient.status.color.withAlpha(38),
+              shape: BoxShape.circle,
             ),
             child: Icon(
-              _getIngredientIcon(ingredient.name),
-              color: AppColors.mediumGrey,
-              size: 20,
+              ingredient.status.icon,
+              color: ingredient.status.color,
+              size: 18,
             ),
           ),
           const SizedBox(width: 12),
+
           // Name and quantity
           Expanded(
             child: Column(
@@ -49,76 +50,39 @@ class IngredientListTile extends StatelessWidget {
               children: [
                 Text(
                   ingredient.name,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w500,
-                    color: AppColors.darkGrey,
+                    color: AppColors.textPrimary,
                   ),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   ingredient.quantity,
-                  style: TextStyle(
-                    fontSize: 12,
+                  style: theme.textTheme.bodySmall?.copyWith(
                     color: AppColors.textMuted,
                   ),
                 ),
               ],
             ),
           ),
-          // Status indicator
-          if (ingredient.isInStock)
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withAlpha(26),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.check,
-                color: AppColors.primary,
-                size: 16,
-              ),
-            )
-          else
-            TextButton(
-              onPressed: onAddTap,
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: const Text(
-                '+ Add',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
+
+          // Status text
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: ingredient.status.color.withAlpha(26),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              ingredient.statusText,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: ingredient.status.color,
+                fontWeight: FontWeight.w600,
               ),
             ),
+          ),
         ],
       ),
     );
-  }
-
-  IconData _getIngredientIcon(String name) {
-    final lowerName = name.toLowerCase();
-    if (lowerName.contains('egg')) return Icons.egg_outlined;
-    if (lowerName.contains('avocado')) return Icons.eco_outlined;
-    if (lowerName.contains('bread')) return Icons.bakery_dining_outlined;
-    if (lowerName.contains('milk')) return Icons.local_drink_outlined;
-    if (lowerName.contains('cheese')) return Icons.lunch_dining_outlined;
-    if (lowerName.contains('spinach') || lowerName.contains('lettuce')) {
-      return Icons.grass_outlined;
-    }
-    if (lowerName.contains('ham') || lowerName.contains('meat')) {
-      return Icons.kebab_dining_outlined;
-    }
-    if (lowerName.contains('pasta')) return Icons.ramen_dining_outlined;
-    if (lowerName.contains('chili') || lowerName.contains('pepper')) {
-      return Icons.local_fire_department_outlined;
-    }
-    return Icons.restaurant_outlined;
   }
 }

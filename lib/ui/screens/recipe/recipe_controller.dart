@@ -2,185 +2,243 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/routes.dart';
+import '../../../data/models/inventory_item.dart';
 import '../../../data/models/recipe.dart';
+import '../../../data/models/recipe_ingredient_display.dart';
+import '../../../data/repositories/inventory_repository.dart';
+import '../../../data/repositories/recipe_repository.dart';
+import '../../../data/services/gemini_service.dart';
 
-/// State for recipe screens
+/// State for recipe screen
 class RecipeState {
   const RecipeState({
-    this.recipes = const [],
-    this.bookmarkedRecipes = const [],
+    this.savedRecipes = const [],
+    this.generatedRecipes = const [],
+    this.inventory = const [],
     this.selectedRecipe,
     this.isLoading = false,
-    this.urgentMessage,
-    this.expiringItems = const [],
+    this.isGenerating = false,
+    this.error,
+    this.expiringItemNames = const [],
   });
 
-  final List<Recipe> recipes;
-  final List<Recipe> bookmarkedRecipes;
+  final List<Recipe> savedRecipes;
+  final List<Recipe> generatedRecipes; // For preview screen
+  final List<InventoryItem> inventory;
   final Recipe? selectedRecipe;
   final bool isLoading;
-  final String? urgentMessage;
-  final List<String> expiringItems; // Items expiring soon for banner
+  final bool isGenerating;
+  final String? error;
+  final List<String> expiringItemNames;
+
+  /// Check if has saved recipes
+  bool get hasSavedRecipes => savedRecipes.isNotEmpty;
+
+  /// Check if has generated recipes (for preview)
+  bool get hasGeneratedRecipes => generatedRecipes.isNotEmpty;
+
+  /// Get selected count for preview
+  int get selectedCount => generatedRecipes.where((r) => r.isSelected).length;
+
+  /// Get expiring items count
+  int get expiringCount => expiringItemNames.length;
 
   RecipeState copyWith({
-    List<Recipe>? recipes,
-    List<Recipe>? bookmarkedRecipes,
+    List<Recipe>? savedRecipes,
+    List<Recipe>? generatedRecipes,
+    List<InventoryItem>? inventory,
     Recipe? selectedRecipe,
     bool? isLoading,
-    String? urgentMessage,
-    List<String>? expiringItems,
+    bool? isGenerating,
+    String? error,
+    List<String>? expiringItemNames,
   }) {
     return RecipeState(
-      recipes: recipes ?? this.recipes,
-      bookmarkedRecipes: bookmarkedRecipes ?? this.bookmarkedRecipes,
+      savedRecipes: savedRecipes ?? this.savedRecipes,
+      generatedRecipes: generatedRecipes ?? this.generatedRecipes,
+      inventory: inventory ?? this.inventory,
       selectedRecipe: selectedRecipe ?? this.selectedRecipe,
       isLoading: isLoading ?? this.isLoading,
-      urgentMessage: urgentMessage ?? this.urgentMessage,
-      expiringItems: expiringItems ?? this.expiringItems,
+      isGenerating: isGenerating ?? this.isGenerating,
+      error: error,
+      expiringItemNames: expiringItemNames ?? this.expiringItemNames,
     );
   }
 }
 
 /// Recipe controller using Riverpod Notifier pattern
 class RecipeController extends Notifier<RecipeState> {
+  late final RecipeRepository _recipeRepository;
+  late final InventoryRepository _inventoryRepository;
+  late final GeminiService _geminiService;
+
   @override
   RecipeState build() {
+    _recipeRepository = ref.watch(recipeRepositoryProvider);
+    _inventoryRepository = ref.watch(inventoryRepositoryProvider);
+    _geminiService = ref.watch(geminiServiceProvider);
+
     // Load initial data
-    _loadRecipes();
+    _loadData();
     return const RecipeState(isLoading: true);
   }
 
-  /// Load recipes (mock data for now, later from Gemini)
-  Future<void> _loadRecipes() async {
-    // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 500));
+  /// Load saved recipes and inventory
+  Future<void> _loadData() async {
+    try {
+      debugPrint('[RecipeController] Loading data...');
 
-    // Mock data matching the UI reference
-    final mockRecipes = [
-      Recipe(
-        id: '1',
-        name: 'Spinach & Cheese Omelet',
-        cookTime: 15,
-        difficulty: RecipeDifficulty.easy,
-        servings: 2,
-        calories: 280,
-        iconData: Icons.egg_alt_outlined,
-        iconColor: const Color(0xFFF97316),
-        ingredients: [
-          const RecipeIngredient(name: 'Spinach', quantity: '1 cup', isInStock: true),
-          const RecipeIngredient(name: 'Eggs', quantity: '3 pcs', isInStock: true),
-          const RecipeIngredient(name: 'Cheddar', quantity: '50g', isInStock: false),
-        ],
-        instructions: [
-          const RecipeInstruction(
-            stepNumber: 1,
-            title: 'Prepare ingredients',
-            description: 'Wash spinach and crack eggs into a bowl. Beat eggs with salt and pepper.',
-          ),
-          const RecipeInstruction(
-            stepNumber: 2,
-            title: 'Cook spinach',
-            description: 'Sauté spinach in butter until wilted, about 2 minutes.',
-          ),
-          const RecipeInstruction(
-            stepNumber: 3,
-            title: 'Make omelet',
-            description: 'Pour eggs over spinach, add cheese, fold and serve.',
-          ),
-        ],
-        proTip: 'Use room temperature eggs for a fluffier omelet.',
-      ),
-      Recipe(
-        id: '2',
-        name: 'Creamy Milk Pasta',
-        cookTime: 20,
-        difficulty: RecipeDifficulty.medium,
-        servings: 1,
-        calories: 450,
-        iconData: Icons.ramen_dining,
-        iconColor: const Color(0xFF3B82F6),
-        ingredients: [
-          const RecipeIngredient(name: 'Milk', quantity: '200ml', isInStock: true),
-          const RecipeIngredient(name: 'Pasta', quantity: '100g', isInStock: false),
-          const RecipeIngredient(name: 'Butter', quantity: '2 tbsp', isInStock: false),
-        ],
-        instructions: [
-          const RecipeInstruction(
-            stepNumber: 1,
-            title: 'Boil pasta',
-            description: 'Cook pasta according to package directions until al dente.',
-          ),
-          const RecipeInstruction(
-            stepNumber: 2,
-            title: 'Make sauce',
-            description: 'Melt butter in a pan, add milk and simmer until slightly thickened.',
-          ),
-          const RecipeInstruction(
-            stepNumber: 3,
-            title: 'Combine',
-            description: 'Toss pasta with sauce, season with salt and pepper.',
-          ),
-        ],
-        proTip: 'Save pasta water to adjust sauce consistency.',
-      ),
-      Recipe(
-        id: '3',
-        name: 'Quick Ham Sandwich',
-        cookTime: 5,
-        difficulty: RecipeDifficulty.easy,
-        servings: 1,
-        calories: 320,
-        iconData: Icons.lunch_dining,
-        iconColor: const Color(0xFFEF4444),
-        ingredients: [
-          const RecipeIngredient(name: 'Ham', quantity: '2 slices', isInStock: true),
-          const RecipeIngredient(name: 'Lettuce', quantity: '2 leaves', isInStock: true),
-          const RecipeIngredient(name: 'Bread', quantity: '2 slices', isInStock: false),
-        ],
-        instructions: [
-          const RecipeInstruction(
-            stepNumber: 1,
-            title: 'Toast bread',
-            description: 'Toast bread slices until golden brown.',
-          ),
-          const RecipeInstruction(
-            stepNumber: 2,
-            title: 'Assemble',
-            description: 'Layer ham and lettuce on bread. Add condiments as desired.',
-          ),
-        ],
-      ),
-    ];
+      // Fetch saved recipes and inventory in parallel
+      final results = await Future.wait([
+        _recipeRepository.getSavedRecipes(),
+        _inventoryRepository.getInventory(),
+      ]);
 
-    state = state.copyWith(
-      recipes: mockRecipes,
-      isLoading: false,
-      expiringItems: ['milk', 'spinach'],
-      urgentMessage: 'Use your milk and spinach before Sunday.',
-    );
+      final savedRecipes = results[0] as List<Recipe>;
+      final inventory = results[1] as List<InventoryItem>;
+
+      // Get expiring items
+      final expiringNames = inventory
+          .where((i) => i.daysUntilExpiry <= 3 && i.daysUntilExpiry >= 0)
+          .map((i) => i.name)
+          .toList();
+
+      debugPrint('[RecipeController] Loaded ${savedRecipes.length} recipes, ${inventory.length} items');
+
+      state = state.copyWith(
+        savedRecipes: savedRecipes,
+        inventory: inventory,
+        expiringItemNames: expiringNames,
+        isLoading: false,
+      );
+    } catch (e) {
+      debugPrint('[RecipeController] ERROR loading data: $e');
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Failed to load recipes',
+      );
+    }
   }
 
-  /// Refresh recipes
+  /// Refresh data
   Future<void> refresh() async {
-    state = state.copyWith(isLoading: true);
-    await _loadRecipes();
+    state = state.copyWith(isLoading: true, error: null);
+    await _loadData();
   }
 
-  /// Toggle bookmark for a recipe
-  void toggleBookmark(String recipeId) {
-    final updatedRecipes = state.recipes.map((recipe) {
+  /// Generate recipes using Gemini AI
+  Future<void> generateRecipes(BuildContext context) async {
+    if (state.inventory.isEmpty) {
+      _showSnackBar(context, 'Tambahkan bahan ke inventory dulu', isError: true);
+      return;
+    }
+
+    state = state.copyWith(isGenerating: true, error: null);
+
+    try {
+      debugPrint('[RecipeController] Generating recipes...');
+
+      final recipes = await _geminiService.generateRecipes(state.inventory);
+
+      if (recipes.isEmpty) {
+        state = state.copyWith(isGenerating: false);
+        if (context.mounted) {
+          _showSnackBar(context, 'Tidak dapat generate resep. Coba lagi.', isError: true);
+        }
+        return;
+      }
+
+      debugPrint('[RecipeController] Generated ${recipes.length} recipes');
+
+      state = state.copyWith(
+        generatedRecipes: recipes,
+        isGenerating: false,
+      );
+
+      // Navigate to preview screen
+      if (context.mounted) {
+        context.push(Routes.recipePreview);
+      }
+    } catch (e) {
+      debugPrint('[RecipeController] ERROR generating recipes: $e');
+      state = state.copyWith(
+        isGenerating: false,
+        error: 'Failed to generate recipes',
+      );
+      if (context.mounted) {
+        _showSnackBar(context, 'Gagal generate resep: $e', isError: true);
+      }
+    }
+  }
+
+  /// Toggle recipe selection in preview
+  void toggleRecipeSelection(String recipeId) {
+    final updatedRecipes = state.generatedRecipes.map((recipe) {
       if (recipe.id == recipeId) {
-        return recipe.copyWith(isBookmarked: !recipe.isBookmarked);
+        return recipe.copyWith(isSelected: !recipe.isSelected);
       }
       return recipe;
     }).toList();
 
-    final bookmarked = updatedRecipes.where((r) => r.isBookmarked).toList();
+    state = state.copyWith(generatedRecipes: updatedRecipes);
+  }
 
-    state = state.copyWith(
-      recipes: updatedRecipes,
-      bookmarkedRecipes: bookmarked,
-    );
+  /// Save selected recipes from preview
+  Future<void> saveSelectedRecipes(BuildContext context) async {
+    final selectedRecipes = state.generatedRecipes
+        .where((r) => r.isSelected)
+        .toList();
+
+    if (selectedRecipes.isEmpty) {
+      _showSnackBar(context, 'Pilih minimal 1 resep untuk disimpan', isError: true);
+      return;
+    }
+
+    try {
+      debugPrint('[RecipeController] Saving ${selectedRecipes.length} recipes...');
+
+      await _recipeRepository.saveRecipes(selectedRecipes);
+
+      // Refresh saved recipes
+      final updatedSavedRecipes = await _recipeRepository.getSavedRecipes();
+
+      state = state.copyWith(
+        savedRecipes: updatedSavedRecipes,
+        generatedRecipes: [], // Clear preview
+      );
+
+      if (context.mounted) {
+        _showSnackBar(context, '${selectedRecipes.length} resep disimpan!');
+        context.pop(); // Go back to recipe screen
+      }
+    } catch (e) {
+      debugPrint('[RecipeController] ERROR saving recipes: $e');
+      if (context.mounted) {
+        _showSnackBar(context, 'Gagal menyimpan resep', isError: true);
+      }
+    }
+  }
+
+  /// Delete saved recipe
+  Future<void> deleteRecipe(String recipeId, BuildContext context) async {
+    try {
+      await _recipeRepository.deleteRecipe(recipeId);
+
+      final updatedRecipes = state.savedRecipes
+          .where((r) => r.id != recipeId)
+          .toList();
+
+      state = state.copyWith(savedRecipes: updatedRecipes);
+
+      if (context.mounted) {
+        _showSnackBar(context, 'Resep dihapus');
+      }
+    } catch (e) {
+      debugPrint('[RecipeController] ERROR deleting recipe: $e');
+      if (context.mounted) {
+        _showSnackBar(context, 'Gagal menghapus resep', isError: true);
+      }
+    }
   }
 
   /// Select a recipe for detail view
@@ -194,24 +252,44 @@ class RecipeController extends Notifier<RecipeState> {
     context.push('${Routes.recipes}/${recipe.id}');
   }
 
-  /// Handle AI query for recipes
-  Future<void> onAiQuery(String query, BuildContext context) async {
-    // TODO: Implement Gemini AI query for recipes
-    // For now, just show a snackbar
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Searching recipes for: $query'),
-          backgroundColor: const Color(0xFF10B981),
-        ),
-      );
-    }
+  /// Validate ingredients for selected recipe
+  List<RecipeIngredientDisplay> validateSelectedRecipeIngredients() {
+    final recipe = state.selectedRecipe;
+    if (recipe == null) return [];
+
+    return RecipeValidator.validateIngredients(recipe, state.inventory);
   }
 
-  /// Mark recipe as done cooking
-  void markDoneCooking(String recipeId) {
-    // TODO: Update inventory (reduce quantities)
-    // For now just show feedback
+  /// Get ingredient summary for selected recipe
+  IngredientSummary? getSelectedRecipeSummary() {
+    final ingredients = validateSelectedRecipeIngredients();
+    if (ingredients.isEmpty) return null;
+
+    return RecipeValidator.getSummary(ingredients);
+  }
+
+  /// Get ingredient summary for a specific recipe
+  IngredientSummary getRecipeSummary(Recipe recipe) {
+    final ingredients = RecipeValidator.validateIngredients(recipe, state.inventory);
+    return RecipeValidator.getSummary(ingredients);
+  }
+
+  /// Clear generated recipes (cancel preview)
+  void clearGeneratedRecipes() {
+    state = state.copyWith(generatedRecipes: []);
+  }
+
+  /// Show snackbar
+  void _showSnackBar(BuildContext context, String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? const Color(0xFFEF4444) : const Color(0xFF22C55E),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
   }
 }
 

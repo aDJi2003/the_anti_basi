@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../config/app_colors.dart';
 import '../../../data/models/recipe.dart';
+import '../../../data/models/recipe_ingredient_display.dart';
 import 'recipe_controller.dart';
 import 'widgets/ingredient_list_tile.dart';
 import 'widgets/instruction_step_tile.dart';
 import 'widgets/pro_tip_card.dart';
 
-/// Recipe detail screen with collapsible header
+/// Recipe detail screen with collapsible header and dynamic ingredient validation
 class RecipeDetailScreen extends ConsumerWidget {
   const RecipeDetailScreen({
     super.key,
@@ -19,13 +21,35 @@ class RecipeDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(recipeControllerProvider);
-    final controller = ref.read(recipeControllerProvider.notifier);
 
-    // Find recipe by id
-    final recipe = state.recipes.firstWhere(
-      (r) => r.id == recipeId,
-      orElse: () => state.selectedRecipe ?? _placeholderRecipe,
+    // Find recipe by id in savedRecipes or generatedRecipes
+    Recipe? recipe = state.savedRecipes.where((r) => r.id == recipeId).firstOrNull;
+    recipe ??= state.generatedRecipes.where((r) => r.id == recipeId).firstOrNull;
+    recipe ??= state.selectedRecipe;
+
+    if (recipe == null) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () => context.pop(),
+            icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          ),
+        ),
+        body: const Center(
+          child: Text('Recipe not found'),
+        ),
+      );
+    }
+
+    // Get validated ingredients
+    final validatedIngredients = RecipeValidator.validateIngredients(
+      recipe,
+      state.inventory,
     );
+    final summary = RecipeValidator.getSummary(validatedIngredients);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -33,7 +57,7 @@ class RecipeDetailScreen extends ConsumerWidget {
         slivers: [
           // Collapsible header
           SliverAppBar(
-            expandedHeight: 280,
+            expandedHeight: 260,
             collapsedHeight: 80,
             pinned: true,
             backgroundColor: AppColors.background,
@@ -41,8 +65,8 @@ class RecipeDetailScreen extends ConsumerWidget {
             leading: Padding(
               padding: const EdgeInsets.all(8.0),
               child: IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.arrow_back, color: AppColors.darkGrey),
+                onPressed: () => context.pop(),
+                icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
                 style: IconButton.styleFrom(
                   backgroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -51,33 +75,12 @@ class RecipeDetailScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  onPressed: () => controller.toggleBookmark(recipe.id),
-                  icon: Icon(
-                    recipe.isBookmarked
-                        ? Icons.bookmark
-                        : Icons.bookmark_border_outlined,
-                    color: AppColors.accent,
-                  ),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-            ],
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: true,
               titlePadding: const EdgeInsets.only(bottom: 16),
               title: LayoutBuilder(
                 builder: (context, constraints) {
-                  // Calculate how collapsed we are (0 = expanded, 1 = collapsed)
-                  final expandRatio = ((constraints.maxHeight - 80) / (280 - 80))
+                  final expandRatio = ((constraints.maxHeight - 80) / (260 - 80))
                       .clamp(0.0, 1.0);
                   final isCollapsed = expandRatio < 0.3;
 
@@ -85,11 +88,11 @@ class RecipeDetailScreen extends ConsumerWidget {
                     duration: const Duration(milliseconds: 200),
                     opacity: isCollapsed ? 1.0 : 0.0,
                     child: Text(
-                      recipe.name,
+                      recipe!.name,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.darkGrey,
+                        color: AppColors.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -117,43 +120,30 @@ class RecipeDetailScreen extends ConsumerWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: AppColors.lightGrey,
+                        color: AppColors.gray200,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
 
+                  // Warning banner if issues
+                  if (summary.unavailable > 0)
+                    _WarningBanner(summary: summary),
+
                   // Ingredients section
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
                     child: _SectionHeader(
-                      title: 'Ingredients',
-                      trailing: Text(
-                        '${recipe.ingredientsInStock} items in stock',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.primary,
-                        ),
-                      ),
+                      title: 'Bahan-bahan',
+                      trailing: _IngredientSummaryChip(summary: summary),
                     ),
                   ),
                   const SizedBox(height: 12),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
-                      children: recipe.ingredients.map((ingredient) {
-                        return IngredientListTile(
-                          ingredient: ingredient,
-                          onAddTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Added ${ingredient.name} to shopping list'),
-                                backgroundColor: AppColors.primary,
-                              ),
-                            );
-                          },
-                        );
+                      children: validatedIngredients.map((ingredient) {
+                        return IngredientListTile(ingredient: ingredient);
                       }).toList(),
                     ),
                   ),
@@ -162,7 +152,7 @@ class RecipeDetailScreen extends ConsumerWidget {
                   // Instructions section
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: _SectionHeader(title: 'Instructions'),
+                    child: _SectionHeader(title: 'Langkah-langkah'),
                   ),
                   const SizedBox(height: 16),
                   Padding(
@@ -173,7 +163,7 @@ class RecipeDetailScreen extends ConsumerWidget {
                         final instruction = entry.value;
                         return InstructionStepTile(
                           instruction: instruction,
-                          isLast: index == recipe.instructions.length - 1,
+                          isLast: index == recipe!.instructions.length - 1,
                         );
                       }).toList(),
                     ),
@@ -181,7 +171,7 @@ class RecipeDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 24),
 
                   // Pro tip
-                  if (recipe.proTip != null) ...[
+                  if (recipe.proTip != null && recipe.proTip!.isNotEmpty) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: ProTipCard(tip: recipe.proTip!),
@@ -189,39 +179,13 @@ class RecipeDetailScreen extends ConsumerWidget {
                     const SizedBox(height: 24),
                   ],
 
-                  // Done cooking button
+                  // Start cooking button
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          controller.markDoneCooking(recipe.id);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Great job! Enjoy your meal!'),
-                              backgroundColor: AppColors.primary,
-                            ),
-                          );
-                          Navigator.of(context).pop();
-                        },
-                        icon: const Icon(Icons.check, color: Colors.white),
-                        label: const Text(
-                          'Done Cooking',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 0,
-                        ),
-                      ),
+                    child: _StartCookingButton(
+                      canCook: summary.canCook,
+                      expiredCount: summary.expired,
+                      missingCount: summary.missing,
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -235,6 +199,77 @@ class RecipeDetailScreen extends ConsumerWidget {
   }
 }
 
+/// Warning banner for ingredient issues
+class _WarningBanner extends StatelessWidget {
+  const _WarningBanner({required this.summary});
+
+  final IngredientSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hasExpired = summary.expired > 0;
+    final hasMissing = summary.missing > 0;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: hasExpired
+              ? AppColors.error.withAlpha(26)
+              : AppColors.warning.withAlpha(26),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: hasExpired
+                ? AppColors.error.withAlpha(51)
+                : AppColors.warning.withAlpha(51),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              hasExpired ? Icons.error_rounded : Icons.warning_rounded,
+              color: hasExpired ? AppColors.error : AppColors.warning,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Perhatian',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: hasExpired ? AppColors.error : AppColors.warning,
+                    ),
+                  ),
+                  Text(
+                    _buildMessage(hasExpired, hasMissing, summary),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: hasExpired
+                          ? AppColors.error.withAlpha(204)
+                          : AppColors.warning.withAlpha(204),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _buildMessage(bool hasExpired, bool hasMissing, IngredientSummary summary) {
+    final parts = <String>[];
+    if (hasExpired) parts.add('${summary.expired} bahan expired');
+    if (hasMissing) parts.add('${summary.missing} bahan tidak tersedia');
+    return parts.join(' • ');
+  }
+}
+
 /// Expanded header content
 class _ExpandedHeader extends StatelessWidget {
   const _ExpandedHeader({required this.recipe});
@@ -243,6 +278,8 @@ class _ExpandedHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(top: 56),
@@ -251,35 +288,49 @@ class _ExpandedHeader extends StatelessWidget {
           children: [
             // Recipe icon in circle
             Container(
-              width: 100,
-              height: 100,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
-                color: (recipe.iconColor ?? AppColors.primary).withAlpha(26),
+                color: AppColors.primary.withAlpha(26),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                recipe.iconData ?? Icons.restaurant,
-                color: recipe.iconColor ?? AppColors.primary,
-                size: 48,
+              child: const Icon(
+                Icons.restaurant_rounded,
+                color: AppColors.primary,
+                size: 40,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             // Recipe title
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 48),
               child: Text(
                 recipe.name,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 22,
+                style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.darkGrey,
+                  color: AppColors.textPrimary,
                   height: 1.2,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            if (recipe.description != null) ...[
+              const SizedBox(height: 4),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 48),
+                child: Text(
+                  recipe.description!,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             // Info chips
             Row(
@@ -290,16 +341,15 @@ class _ExpandedHeader extends StatelessWidget {
                   label: recipe.cookTimeDisplay,
                 ),
                 const SizedBox(width: 8),
-                if (recipe.calories != null) ...[
-                  _InfoChip(
-                    icon: Icons.local_fire_department_outlined,
-                    label: '${recipe.calories} kcal',
-                  ),
-                  const SizedBox(width: 8),
-                ],
                 _InfoChip(
                   icon: recipe.difficulty.icon,
                   label: recipe.difficulty.displayName,
+                  color: recipe.difficulty.color,
+                ),
+                const SizedBox(width: 8),
+                _InfoChip(
+                  icon: Icons.people_outline_rounded,
+                  label: recipe.servingsDisplay,
                 ),
               ],
             ),
@@ -315,34 +365,66 @@ class _InfoChip extends StatelessWidget {
   const _InfoChip({
     required this.icon,
     required this.label,
+    this.color,
   });
 
   final IconData icon;
   final String label;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final chipColor = color ?? AppColors.textMuted;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.lightGrey),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.gray200),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: AppColors.mediumGrey),
+          Icon(icon, size: 14, color: chipColor),
           const SizedBox(width: 4),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 11,
+            style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w500,
-              color: AppColors.darkGrey,
+              color: chipColor,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Ingredient summary chip
+class _IngredientSummaryChip extends StatelessWidget {
+  const _IngredientSummaryChip({required this.summary});
+
+  final IngredientSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = summary.canCook ? AppColors.success : AppColors.warning;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withAlpha(26),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        '${summary.available}/${summary.total} tersedia',
+        style: theme.textTheme.labelSmall?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
       ),
     );
   }
@@ -360,15 +442,16 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 18,
+          style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppColors.darkGrey,
+            color: AppColors.textPrimary,
           ),
         ),
         if (trailing != null) trailing!,
@@ -377,13 +460,63 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-/// Placeholder recipe for error states
-final _placeholderRecipe = Recipe(
-  id: '0',
-  name: 'Recipe Not Found',
-  cookTime: 0,
-  difficulty: RecipeDifficulty.easy,
-  servings: 0,
-  ingredients: const [],
-  instructions: const [],
-);
+/// Start cooking button with state awareness
+class _StartCookingButton extends StatelessWidget {
+  const _StartCookingButton({
+    required this.canCook,
+    required this.expiredCount,
+    required this.missingCount,
+  });
+
+  final bool canCook;
+  final int expiredCount;
+  final int missingCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: FilledButton.icon(
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                canCook
+                    ? 'Selamat memasak!'
+                    : 'Beberapa bahan belum tersedia',
+              ),
+              backgroundColor: canCook ? AppColors.success : AppColors.warning,
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+        },
+        icon: Icon(
+          canCook ? Icons.restaurant_menu_rounded : Icons.warning_rounded,
+          color: Colors.white,
+        ),
+        label: Text(
+          canCook
+              ? 'Mulai Masak'
+              : 'Mulai Masak (${expiredCount + missingCount} bahan kurang)',
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        style: FilledButton.styleFrom(
+          backgroundColor: canCook ? AppColors.primary : AppColors.warning,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
+  }
+}
