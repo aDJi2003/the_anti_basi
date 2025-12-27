@@ -16,7 +16,7 @@ class ProfileState {
     this.isLoading = false,
     this.user,
     this.isDarkMode = false,
-    this.appVersion = 'v2.4.0 (302)',
+    this.appVersion = 'v1.0.0',
     this.errorMessage,
   });
 
@@ -62,16 +62,10 @@ class ProfileController extends Notifier<ProfileState> {
       final userProfile = await _userRepo.getCurrentUser();
       debugPrint('[ProfileController] Got user: ${userProfile?.displayName}');
 
-      state = state.copyWith(
-        isLoading: false,
-        user: userProfile,
-      );
+      state = state.copyWith(isLoading: false, user: userProfile);
     } catch (e) {
       debugPrint('[ProfileController] ERROR: $e');
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }
 
@@ -171,9 +165,7 @@ class ProfileController extends Notifier<ProfileState> {
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Log Out'),
           ),
         ],
@@ -193,7 +185,7 @@ class ProfileController extends Notifier<ProfileState> {
   /// Edit avatar
   Future<void> onEditAvatar(BuildContext context) async {
     final picker = ImagePicker();
-    
+
     // Show modal bottom sheet to choose source (Camera or Gallery)
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
@@ -229,16 +221,16 @@ class ProfileController extends Notifier<ProfileState> {
       if (image == null) return;
 
       state = state.copyWith(isLoading: true);
-      
+
       // 1. Upload image
       final downloadUrl = await _userRepo.uploadProfileImage(File(image.path));
-      
+
       // 2. Update profile with new URL
       await _userRepo.updatePhotoURL(downloadUrl);
-      
+
       // 3. Reload profile
       await _loadProfile();
-      
+
       if (context.mounted) {
         _showSnackBar(context, 'Profile photo updated');
       }
@@ -257,9 +249,7 @@ class ProfileController extends Notifier<ProfileState> {
         content: Text(message),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
