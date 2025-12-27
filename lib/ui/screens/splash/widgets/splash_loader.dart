@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 
 /// Bottom loader section with animated progress bar and secure text
 /// Uses Material 3 motion guidelines with 1500ms duration
@@ -53,7 +54,7 @@ class _SplashLoaderState extends State<SplashLoader>
           child: ClipRRect(
             borderRadius: BorderRadius.circular(2),
             child: ColoredBox(
-              color: AppColors.gray200,
+              color: context.colors.border,
               child: SlideTransition(
                 position: _slideAnimation,
                 child: FractionallySizedBox(
@@ -79,7 +80,7 @@ class _SplashLoaderState extends State<SplashLoader>
             Icon(
               Icons.lock_outline,
               size: 12,
-              color: AppColors.textMuted.withAlpha(153),
+              color: context.colors.textMuted.withAlpha(153),
             ),
             const SizedBox(width: 6),
             Text(
@@ -87,7 +88,7 @@ class _SplashLoaderState extends State<SplashLoader>
               style: theme.textTheme.labelSmall?.copyWith(
                 fontSize: 9,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textMuted.withAlpha(153),
+                color: context.colors.textMuted.withAlpha(153),
                 letterSpacing: 1.5,
               ),
             ),

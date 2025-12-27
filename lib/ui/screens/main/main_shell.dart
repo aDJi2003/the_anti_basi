@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../config/app_colors.dart';
 import '../../../config/routes.dart';
 import '../../widgets/common/app_bottom_nav_bar.dart';
 
@@ -18,7 +17,7 @@ class MainShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      // backgroundColor from theme (scaffoldBackgroundColor)
       body: child,
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _getCurrentIndex(context),

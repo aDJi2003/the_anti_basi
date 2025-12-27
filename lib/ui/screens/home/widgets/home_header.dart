@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 import '../../../widgets/common/notification_button.dart';
 
 /// Home screen header with user greeting and notification bell
@@ -36,7 +37,7 @@ class HomeHeader extends StatelessWidget {
                     Text(
                       _getGreeting(),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -44,7 +45,7 @@ class HomeHeader extends StatelessWidget {
                       '$userName!',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                   ],

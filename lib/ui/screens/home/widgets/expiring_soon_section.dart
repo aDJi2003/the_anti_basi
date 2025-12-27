@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 import '../../../../data/models/inventory_item.dart';
 import 'expiring_item_card.dart';
 
@@ -37,7 +37,7 @@ class ExpiringSoonSection extends StatelessWidget {
                 'Expiring Soon',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               GestureDetector(
@@ -45,7 +45,7 @@ class ExpiringSoonSection extends StatelessWidget {
                 child: Text(
                   'Full records',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -125,7 +125,7 @@ class _DayGroup extends StatelessWidget {
         Text(
           label,
           style: theme.textTheme.labelSmall?.copyWith(
-            color: AppColors.textMuted,
+            color: context.colors.textMuted,
             fontWeight: FontWeight.w700,
             letterSpacing: 1,
             fontSize: 10,
@@ -156,30 +156,30 @@ class _EmptyState extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.gray200),
+        border: Border.all(color: context.colors.border),
       ),
       child: Column(
         children: [
           Icon(
             Icons.check_circle_outline_rounded,
             size: 40,
-            color: AppColors.primary.withAlpha(153),
+            color: context.colors.primary.withAlpha(153),
           ),
           const SizedBox(height: 12),
           Text(
             'All good!',
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             'No items expiring soon',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/app_colors.dart';
+import '../../../config/app_colors_extension.dart';
 import '../../../data/models/app_notification.dart';
 import '../../screens/notification/notification_controller.dart';
 
@@ -29,9 +30,9 @@ class NotificationSheet extends ConsumerWidget {
       maxChildSize: 0.95,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: context.colors.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             children: [
@@ -42,7 +43,7 @@ class NotificationSheet extends ConsumerWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.gray300,
+                    color: context.colors.textMuted,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -57,14 +58,14 @@ class NotificationSheet extends ConsumerWidget {
                     : null,
               ),
 
-              const Divider(height: 1, color: AppColors.gray100),
+              Divider(height: 1, color: context.colors.divider),
 
               // Content
               Expanded(
                 child: state.isLoading
-                    ? const Center(
+                    ? Center(
                         child: CircularProgressIndicator(
-                          color: AppColors.primary,
+                          color: context.colors.primary,
                         ),
                       )
                     : state.notifications.isEmpty
@@ -73,11 +74,11 @@ class NotificationSheet extends ConsumerWidget {
                             controller: scrollController,
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             itemCount: state.notifications.length,
-                            separatorBuilder: (context, index) => const Divider(
+                            separatorBuilder: (context, index) => Divider(
                               height: 1,
                               indent: 72,
                               endIndent: 20,
-                              color: AppColors.gray100,
+                              color: context.colors.divider,
                             ),
                             itemBuilder: (context, index) {
                               final notification = state.notifications[index];
@@ -160,12 +161,12 @@ class _NotificationHeader extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                const Text(
+                Text(
                   'Notifications',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.darkGrey,
+                    color: context.colors.textPrimary,
                   ),
                 ),
                 if (unreadCount > 0) ...[
@@ -207,7 +208,7 @@ class _NotificationHeader extends StatelessWidget {
 
           // More options
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: AppColors.mediumGrey),
+            icon: Icon(Icons.more_vert, color: context.colors.textMuted),
             onSelected: (value) {
               if (value == 'clear' && onClearAll != null) {
                 onClearAll!();
@@ -300,7 +301,7 @@ class _NotificationTile extends StatelessWidget {
                               fontWeight: notification.isRead
                                   ? FontWeight.w500
                                   : FontWeight.w600,
-                              color: AppColors.darkGrey,
+                              color: context.colors.textPrimary,
                             ),
                           ),
                         ),
@@ -321,7 +322,7 @@ class _NotificationTile extends StatelessWidget {
                       notification.message,
                       style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.textMuted,
+                        color: context.colors.textMuted,
                         height: 1.4,
                       ),
                       maxLines: 2,
@@ -335,7 +336,7 @@ class _NotificationTile extends StatelessWidget {
                           notification.timeAgo,
                           style: TextStyle(
                             fontSize: 11,
-                            color: AppColors.textMuted,
+                            color: context.colors.textMuted,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -386,22 +387,22 @@ class _EmptyState extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.gray100,
+                color: context.colors.inputBackground,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.notifications_off_outlined,
-                color: AppColors.gray400,
+                color: context.colors.textMuted,
                 size: 40,
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'No Notifications',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppColors.darkGrey,
+                color: context.colors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -409,7 +410,7 @@ class _EmptyState extends StatelessWidget {
               'You\'re all caught up! We\'ll notify you\nwhen something needs your attention.',
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textMuted,
+                color: context.colors.textMuted,
                 height: 1.5,
               ),
               textAlign: TextAlign.center,

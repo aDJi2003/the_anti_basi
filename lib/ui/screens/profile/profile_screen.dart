@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../config/app_colors.dart';
+import '../../../config/app_colors_extension.dart';
+import '../../../data/providers/theme_provider.dart';
 import '../../widgets/common/app_button.dart';
 import 'profile_controller.dart';
 import 'widgets/profile_avatar.dart';
@@ -17,6 +18,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(profileControllerProvider);
     final controller = ref.read(profileControllerProvider.notifier);
+    final isDarkMode = ref.watch(themeProvider) == ThemeMode.dark;
 
     return SafeArea(
       bottom: false,
@@ -79,7 +81,7 @@ class ProfileScreen extends ConsumerWidget {
                           icon: Icons.dark_mode_outlined,
                           label: 'Dark Mode',
                           subtitle: 'Adjust app appearance',
-                          value: state.isDarkMode,
+                          value: isDarkMode,
                           onChanged: controller.toggleDarkMode,
                         ),
                       ],
@@ -102,7 +104,7 @@ class ProfileScreen extends ConsumerWidget {
                   Text(
                     state.appVersion,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.textMuted,
+                      color: context.colors.textMuted,
                       fontFamily: 'monospace',
                       fontSize: 10,
                     ),
@@ -120,8 +122,8 @@ class _LoadingState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: CircularProgressIndicator(color: AppColors.primary),
+    return Center(
+      child: CircularProgressIndicator(color: context.colors.primary),
     );
   }
 }

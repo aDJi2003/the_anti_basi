@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 
 /// Profile screen header with centered title
 class ProfileHeader extends StatelessWidget {
@@ -21,7 +21,7 @@ class ProfileHeader extends StatelessWidget {
           title,
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
           ),
         ),
       ),

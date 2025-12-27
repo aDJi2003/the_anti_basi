@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 
 /// Settings section with title and card container
 class SettingsSection extends StatelessWidget {
@@ -26,7 +26,7 @@ class SettingsSection extends StatelessWidget {
             title.toUpperCase(),
             style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
               letterSpacing: 1.0,
             ),
           ),
@@ -35,9 +35,9 @@ class SettingsSection extends StatelessWidget {
         // Card container
         Container(
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: context.colors.surface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: context.colors.border),
           ),
           clipBehavior: Clip.antiAlias,
           child: Column(

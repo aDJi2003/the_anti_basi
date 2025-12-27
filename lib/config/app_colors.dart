@@ -46,7 +46,7 @@ class AppColors {
   static const Color gray800 = Color(0xFF1F2937);
   static const Color gray900 = Color(0xFF111827);
 
-  // Semantic aliases
+  // Semantic aliases (Light Mode)
   static const Color textPrimary = gray900;
   static const Color textSecondary = gray500;
   static const Color textMuted = gray400;
@@ -58,4 +58,20 @@ class AppColors {
   static const Color mediumGrey = Color(0xFF6B7280); // gray500
   static const Color lightGrey = Color(0xFFF3F4F6); // gray100
   static const Color yellow = Color(0xFFFFC107);
+
+  // ============ DARK MODE COLORS ============
+
+  // Dark Mode Backgrounds
+  static const Color darkBackground = Color(0xFF0F172A);    // slate-900
+  static const Color darkSurface = Color(0xFF1E293B);       // slate-800
+  static const Color darkSurfaceLight = Color(0xFF334155);  // slate-700
+
+  // Dark Mode Text
+  static const Color darkTextPrimary = Color(0xFFF8FAFC);   // slate-50
+  static const Color darkTextSecondary = Color(0xFF94A3B8); // slate-400
+  static const Color darkTextMuted = Color(0xFF64748B);     // slate-500
+
+  // Dark Mode Borders
+  static const Color darkBorder = Color(0xFF334155);        // slate-700
+  static const Color darkDivider = Color(0xFF1E293B);       // slate-800
 }

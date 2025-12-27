@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 
 /// Settings row tile with icon, label, value, and chevron
 class SettingsTile extends StatelessWidget {
@@ -37,12 +38,12 @@ class SettingsTile extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: AppColors.gray100,
+                      color: context.colors.inputBackground,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       icon,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                       size: 20,
                     ),
                   ),
@@ -54,7 +55,7 @@ class SettingsTile extends StatelessWidget {
                       label,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                   ),
@@ -64,14 +65,14 @@ class SettingsTile extends StatelessWidget {
                     Text(
                       value!,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                     const SizedBox(width: 4),
                   ],
-                  const Icon(
+                  Icon(
                     Icons.chevron_right_rounded,
-                    color: AppColors.gray400,
+                    color: context.colors.textMuted,
                     size: 20,
                   ),
                 ],
@@ -80,10 +81,10 @@ class SettingsTile extends StatelessWidget {
           ),
         ),
         if (showDivider)
-          const Divider(
+          Divider(
             height: 1,
             indent: 64,
-            color: AppColors.gray100,
+            color: context.colors.divider,
           ),
       ],
     );
@@ -144,14 +145,14 @@ class ToggleTile extends StatelessWidget {
                   label,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
                 if (subtitle != null)
                   Text(
                     subtitle!,
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                       fontSize: 10,
                     ),
                   ),

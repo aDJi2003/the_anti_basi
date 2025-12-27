@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 import '../../../widgets/common/common.dart';
 
 /// Login form with email, password fields, social login, and submit button
@@ -106,7 +106,7 @@ class _LoginFormState extends State<LoginForm> {
               Text(
                 "Don't have an account? ",
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               GestureDetector(
@@ -114,7 +114,7 @@ class _LoginFormState extends State<LoginForm> {
                 child: Text(
                   'Sign up',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.primary,
+                    color: context.colors.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -164,19 +164,19 @@ class _GoogleSignInButton extends StatelessWidget {
       onPressed: isLoading ? null : onPressed,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 16),
-        side: const BorderSide(color: AppColors.gray200),
+        side: BorderSide(color: context.colors.border),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: context.colors.surface,
       ),
       child: isLoading
-          ? const SizedBox(
+          ? SizedBox(
               height: 24,
               width: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: AppColors.mediumGrey,
+                color: context.colors.textMuted,
               ),
             )
           : Row(
@@ -194,12 +194,12 @@ class _GoogleSignInButton extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text(
+                Text(
                   'Continue with Google',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.darkGrey,
+                    color: context.colors.textPrimary,
                   ),
                 ),
               ],
@@ -263,7 +263,7 @@ class _OrDivider extends StatelessWidget {
         Expanded(
           child: Container(
             height: 1,
-            color: AppColors.gray200,
+            color: context.colors.border,
           ),
         ),
         Padding(
@@ -272,14 +272,14 @@ class _OrDivider extends StatelessWidget {
             'or',
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.textMuted,
+              color: context.colors.textMuted,
             ),
           ),
         ),
         Expanded(
           child: Container(
             height: 1,
-            color: AppColors.gray200,
+            color: context.colors.border,
           ),
         ),
       ],

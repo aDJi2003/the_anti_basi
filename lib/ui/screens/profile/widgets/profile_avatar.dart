@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 
 /// Profile avatar with user info
 class ProfileAvatar extends StatelessWidget {
@@ -31,12 +31,12 @@ class ProfileAvatar extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppColors.white,
+                color: context.colors.surface,
                 width: 3,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.gray900.withAlpha(26),
+                  color: context.colors.textPrimary.withAlpha(26),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -47,10 +47,10 @@ class ProfileAvatar extends StatelessWidget {
                   ? Image.network(
                       avatarUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          _buildDefaultAvatar(),
+                      errorBuilder: (ctx, error, stackTrace) =>
+                          _buildDefaultAvatar(ctx),
                     )
-                  : _buildDefaultAvatar(),
+                  : _buildDefaultAvatar(context),
             ),
           ),
         ),
@@ -61,7 +61,7 @@ class ProfileAvatar extends StatelessWidget {
           name,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
           ),
         ),
 
@@ -71,7 +71,7 @@ class ProfileAvatar extends StatelessWidget {
           Text(
             subtitle!,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ],
@@ -79,12 +79,12 @@ class ProfileAvatar extends StatelessWidget {
     );
   }
 
-  Widget _buildDefaultAvatar() {
+  Widget _buildDefaultAvatar(BuildContext context) {
     return Container(
-      color: AppColors.gray100,
-      child: const Icon(
+      color: context.colors.inputBackground,
+      child: Icon(
         Icons.person_rounded,
-        color: AppColors.gray400,
+        color: context.colors.textMuted,
         size: 48,
       ),
     );

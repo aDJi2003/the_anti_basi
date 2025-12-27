@@ -133,7 +133,7 @@ class LoginController extends Notifier<LoginState> {
   }
 
   void navigateToSignUp(BuildContext context) {
-    _showInfoSnackBar(context, 'Fitur daftar belum dibuat.');
+    context.go(Routes.signUp);
   }
 
   void _showErrorSnackBar(BuildContext context, String message) {
@@ -145,12 +145,6 @@ class LoginController extends Notifier<LoginState> {
   void _showSuccessSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.green),
-    );
-  }
-
-  void _showInfoSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
     );
   }
 }

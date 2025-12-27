@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 
 /// Search bar for inventory filtering
 class InventorySearchBar extends StatelessWidget {
@@ -22,24 +22,24 @@ class InventorySearchBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: context.colors.surface,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.colors.border),
         ),
         child: TextField(
           controller: controller,
           onChanged: onChanged,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textMuted,
+              color: context.colors.textMuted,
             ),
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               Icons.search_rounded,
-              color: AppColors.textMuted,
+              color: context.colors.textMuted,
               size: 22,
             ),
             border: InputBorder.none,

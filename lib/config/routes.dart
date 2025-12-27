@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../ui/screens/auth/login_screen.dart';
+import '../ui/screens/auth/signup_screen.dart';
 import '../ui/screens/home/home_screen.dart';
 import '../ui/screens/inventory/inventory_screen.dart';
 import '../ui/screens/main/main_shell.dart';
@@ -54,6 +55,11 @@ class AppRouter {
         path: Routes.login,
         name: 'login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: Routes.signUp,
+        name: 'signUp',
+        builder: (context, state) => const SignUpScreen(),
       ),
 
       // Main app routes (inside shell with persistent bottom nav)

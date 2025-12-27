@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 
 /// Warning banner for items that need attention
 class AttentionBanner extends StatelessWidget {
@@ -49,7 +50,7 @@ class AttentionBanner extends StatelessWidget {
                         'Attention',
                         style: theme.textTheme.labelMedium?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          color: context.colors.textPrimary,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -57,7 +58,7 @@ class AttentionBanner extends StatelessWidget {
                         child: Text(
                           '$itemCount items need eating before they go basi!',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),

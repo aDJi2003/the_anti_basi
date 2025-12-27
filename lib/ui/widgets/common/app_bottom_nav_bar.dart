@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/app_colors.dart';
+import '../../../config/app_colors_extension.dart';
 
 /// Navigation item data
 enum NavItem {
@@ -57,9 +58,9 @@ class AppBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white.withAlpha(242), // 95% opacity
+        color: context.colors.surface.withAlpha(242), // 95% opacity
         border: Border(
-          top: BorderSide(color: AppColors.gray200),
+          top: BorderSide(color: context.colors.border),
         ),
       ),
       child: SafeArea(
@@ -113,7 +114,7 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = isActive ? AppColors.primary : AppColors.textMuted;
+    final color = isActive ? context.colors.primary : context.colors.textMuted;
 
     return Material(
       color: Colors.transparent,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../config/app_colors.dart';
+import '../../../config/app_colors_extension.dart';
 import 'splash_controller.dart';
 import 'widgets/background_pattern.dart';
 import 'widgets/splash_content.dart';
@@ -56,7 +56,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       body: Stack(
         children: [
           // Background pattern with food icons
