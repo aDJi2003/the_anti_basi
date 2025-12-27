@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/app_notification.dart';
 import '../../../data/providers/auth_state_provider.dart';
@@ -66,7 +67,8 @@ class NotificationController extends Notifier<NotificationState> {
 
       final List<AppNotification> generatedNotifications = [];
       final now = DateTime.now();
-
+      final today = DateTime(now.year, now.month, now.day);
+      
       for (var doc in snapshot.docs) {
         final data = doc.data();
         
@@ -76,14 +78,17 @@ class NotificationController extends Notifier<NotificationState> {
           final String itemName = data['displayName'] ?? data['name'] ?? 'Item';
           final String itemId = doc.id;
 
-          final difference = expiryDate.difference(now).inDays;
+          final difference = expiryDate.difference(today).inDays;
 
           if (difference <= 3 && difference >= 0) {
+            final title = 'Waspada Bahan Makanan!';
+            final message = '$itemName akan kedaluwarsa ${difference == 0 ? "hari ini" : "dalam $difference hari"}. Gunakan segera!';
+            
             generatedNotifications.add(
               AppNotification(
                 id: 'notif_expiry_$itemId',
-                title: 'Waspada Bahan Makanan!',
-                message: '$itemName akan kedaluwarsa dalam ${difference == 0 ? "hari ini" : "$difference hari"}. Gunakan segera!',
+                title: title,
+                message: message,
                 type: NotificationType.expiringSoon,
                 createdAt: DateTime.now(), 
                 isRead: false,
@@ -113,7 +118,7 @@ class NotificationController extends Notifier<NotificationState> {
       );
 
     } catch (e) {
-      print("Error fetching notifications: $e");
+      debugPrint("Error fetching notifications: $e");
       state = state.copyWith(isLoading: false);
     }
   }

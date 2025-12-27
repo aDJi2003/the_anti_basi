@@ -15,6 +15,7 @@ class SourceImages extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -26,7 +27,7 @@ class SourceImages extends StatelessWidget {
             'SOURCE IMAGE',
             style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
               letterSpacing: 1.0,
             ),
           ),
@@ -69,12 +70,15 @@ class _ImageThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: 96,
       height: 128,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.gray200),
+        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.gray200),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha(13),
@@ -92,10 +96,10 @@ class _ImageThumbnail extends StatelessWidget {
             imagePath,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) => Container(
-              color: AppColors.gray100,
-              child: const Icon(
+              color: isDark ? AppColors.darkSurfaceLight : AppColors.gray100,
+              child: Icon(
                 Icons.image_outlined,
-                color: AppColors.gray400,
+                color: isDark ? AppColors.darkTextMuted : AppColors.gray400,
               ),
             ),
           ),
@@ -143,6 +147,8 @@ class _AddImageButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -151,15 +157,15 @@ class _AddImageButton extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.gray300,
+            color: isDark ? AppColors.darkBorder : AppColors.gray300,
             style: BorderStyle.solid,
             width: 2,
           ),
         ),
-        child: const Center(
+        child: Center(
           child: Icon(
             Icons.add_a_photo_outlined,
-            color: AppColors.gray400,
+            color: isDark ? AppColors.darkTextMuted : AppColors.gray400,
             size: 28,
           ),
         ),

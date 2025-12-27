@@ -15,6 +15,8 @@ class ResultsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -23,9 +25,9 @@ class ResultsHeader extends StatelessWidget {
           // Back button
           IconButton(
             onPressed: onBack,
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_rounded,
-              color: AppColors.textPrimary,
+              color: textColor,
             ),
           ),
 
@@ -36,7 +38,7 @@ class ResultsHeader extends StatelessWidget {
               textAlign: TextAlign.center,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: textColor,
               ),
             ),
           ),
@@ -44,9 +46,9 @@ class ResultsHeader extends StatelessWidget {
           // More button
           IconButton(
             onPressed: onMore,
-            icon: const Icon(
+            icon: Icon(
               Icons.more_horiz_rounded,
-              color: AppColors.textPrimary,
+              color: textColor,
             ),
           ),
         ],

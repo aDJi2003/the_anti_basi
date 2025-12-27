@@ -160,6 +160,24 @@ class UserRepository {
     }
   }
 
+  /// Save FCM Token for push notifications
+  Future<void> saveFCMToken(String token) async {
+    final doc = _userDoc;
+    if (doc == null) return; // Silent return if not logged in
+
+    try {
+      await doc.set({
+        'fcmToken': token,
+        'lastTokenUpdate': FieldValue.serverTimestamp(),
+        'platform': Platform.operatingSystem, // 'android', 'ios', etc.
+      }, SetOptions(merge: true));
+      debugPrint('[UserRepo] FCM Token saved');
+    } catch (e) {
+      debugPrint('[UserRepo] ERROR saving FCM token: $e');
+      // Non-blocking error
+    }
+  }
+
   /// Update user preferences
   Future<void> updatePreferences(UserPreferences preferences) async {
     final doc = _userDoc;
