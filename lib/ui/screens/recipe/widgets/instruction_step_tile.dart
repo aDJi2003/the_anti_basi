@@ -15,6 +15,8 @@ class InstructionStepTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: EdgeInsets.only(bottom: isLast ? 0 : 24),
       child: Row(
@@ -47,10 +49,10 @@ class InstructionStepTile extends StatelessWidget {
               children: [
                 Text(
                   instruction.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.darkGrey,
+                    color: isDark ? AppColors.darkTextPrimary : AppColors.darkGrey,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -58,7 +60,7 @@ class InstructionStepTile extends StatelessWidget {
                   instruction.description,
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textMuted,
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.textMuted,
                     height: 1.5,
                   ),
                 ),

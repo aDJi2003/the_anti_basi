@@ -14,15 +14,16 @@ class IngredientListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: ingredient.status.bgColor,
+        color: ingredient.status.color.withAlpha(isDark ? 51 : 26),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: ingredient.status.color.withAlpha(51),
+          color: ingredient.status.color.withAlpha(isDark ? 77 : 51),
         ),
       ),
       child: Row(
@@ -52,14 +53,14 @@ class IngredientListTile extends StatelessWidget {
                   ingredient.name,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   ingredient.quantity,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
+                    color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                   ),
                 ),
               ],

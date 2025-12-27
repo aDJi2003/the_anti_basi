@@ -29,7 +29,7 @@ class HomeHeader extends StatelessWidget {
             onTap: onAvatarTap,
             child: Row(
               children: [
-                _buildAvatar(),
+                _buildAvatar(context),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +63,7 @@ class HomeHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatar() {
+  Widget _buildAvatar(BuildContext context) {
     return Container(
       width: 44,
       height: 44,
@@ -76,19 +76,20 @@ class HomeHeader extends StatelessWidget {
             ? Image.network(
                 userAvatarUrl!,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(),
+                errorBuilder: (ctx, error, stackTrace) => _buildDefaultAvatar(context),
               )
-            : _buildDefaultAvatar(),
+            : _buildDefaultAvatar(context),
       ),
     );
   }
 
-  Widget _buildDefaultAvatar() {
+  Widget _buildDefaultAvatar(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      color: AppColors.gray100,
-      child: const Icon(
+      color: isDark ? AppColors.darkSurfaceLight : AppColors.gray100,
+      child: Icon(
         Icons.person,
-        color: AppColors.gray400,
+        color: isDark ? AppColors.darkTextSecondary : AppColors.gray400,
         size: 24,
       ),
     );

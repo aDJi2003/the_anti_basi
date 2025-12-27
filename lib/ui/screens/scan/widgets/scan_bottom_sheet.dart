@@ -22,7 +22,7 @@ class ScanBottomSheet extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
@@ -43,7 +43,7 @@ class ScanBottomSheet extends StatelessWidget {
               width: 48,
               height: 6,
               decoration: BoxDecoration(
-                color: AppColors.gray200,
+                color: theme.dividerColor,
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -98,9 +98,9 @@ class ScanBottomSheet extends StatelessWidget {
                   // Manual input button
                   _ActionButton(
                     onTap: onManualInput,
-                    child: const Icon(
+                    child: Icon(
                       Icons.keyboard_rounded,
-                      color: AppColors.textSecondary,
+                      color: theme.iconTheme.color?.withValues(alpha: 0.7) ?? AppColors.textSecondary,
                       size: 28,
                     ),
                   ),
@@ -133,11 +133,14 @@ class _GalleryPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Container(
-      color: AppColors.gray100,
-      child: const Icon(
+      color: isDark ? AppColors.darkSurfaceLight : AppColors.gray100,
+      child: Icon(
         Icons.photo_library_outlined,
-        color: AppColors.gray400,
+        color: isDark ? AppColors.darkTextSecondary : AppColors.gray400,
         size: 24,
       ),
     );
@@ -156,8 +159,11 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Material(
-      color: AppColors.gray50,
+      color: isDark ? AppColors.darkSurfaceLight : AppColors.gray50,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -167,7 +173,9 @@ class _ActionButton extends StatelessWidget {
           height: 56,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.gray200),
+            border: Border.all(
+              color: isDark ? AppColors.darkBorder : AppColors.gray200,
+            ),
           ),
           clipBehavior: Clip.antiAlias,
           child: Center(child: child),

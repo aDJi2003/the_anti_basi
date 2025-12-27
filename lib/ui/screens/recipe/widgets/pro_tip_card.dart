@@ -12,6 +12,8 @@ class ProTipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -54,7 +56,7 @@ class ProTipCard extends StatelessWidget {
                   tip,
                   style: TextStyle(
                     fontSize: 13,
-                    color: AppColors.darkGrey.withAlpha(204),
+                    color: isDark ? AppColors.warningLight.withAlpha(230) : AppColors.darkGrey.withAlpha(204),
                     height: 1.4,
                   ),
                 ),

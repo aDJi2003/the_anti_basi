@@ -145,6 +145,7 @@ class _RecipeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -157,14 +158,14 @@ class _RecipeHeader extends StatelessWidget {
                 Text(
                   'What will you',
                   style: theme.textTheme.titleLarge?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
                 Text(
                   'cook today?',
                   style: theme.textTheme.headlineSmall?.copyWith(
-                    color: AppColors.textPrimary,
+                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -194,15 +195,16 @@ class _GenerateCtaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.gray200),
+          border: Border.all(color: theme.dividerColor),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha(13),
@@ -265,7 +267,7 @@ class _GenerateCtaCard extends StatelessWidget {
                   Text(
                     'Need recipe ideas?',
                     style: theme.textTheme.titleLarge?.copyWith(
-                      color: AppColors.textPrimary,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -273,7 +275,7 @@ class _GenerateCtaCard extends StatelessWidget {
                   Text(
                     'Generate recipes based on your fridge items',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                     ),
                   ),
 
@@ -368,17 +370,18 @@ class _SavedRecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Material(
-        color: AppColors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         elevation: 0,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.gray200),
+            border: Border.all(color: theme.dividerColor),
           ),
           child: InkWell(
             onTap: onTap,
@@ -414,7 +417,7 @@ class _SavedRecipeCard extends StatelessWidget {
                           recipe.name,
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -425,16 +428,16 @@ class _SavedRecipeCard extends StatelessWidget {
                             Icon(
                               Icons.schedule_rounded,
                               size: 14,
-                              color: AppColors.textMuted,
+                              color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               recipe.cookTimeDisplay,
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: AppColors.textMuted,
+                                color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                               ),
                             ),
-                            _buildDot(),
+                            _buildDot(isDark),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 6,
@@ -483,13 +486,13 @@ class _SavedRecipeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDot() {
+  Widget _buildDot(bool isDark) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
       child: Text(
         '•',
         style: TextStyle(
-          color: AppColors.textMuted,
+          color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
           fontSize: 12,
         ),
       ),
@@ -578,6 +581,7 @@ class _EmptySavedState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Center(
       child: Padding(
@@ -603,14 +607,14 @@ class _EmptySavedState extends StatelessWidget {
               'No Saved Recipes',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Generate recipes from your fridge items to get started',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
+                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),

@@ -9,7 +9,7 @@ class ThemeNotifier extends Notifier<ThemeMode> {
   @override
   ThemeMode build() {
     _loadTheme();
-    return ThemeMode.system; // Default to system
+    return ThemeMode.light; // Default to Light instead of system
   }
 
   Future<void> _loadTheme() async {
@@ -25,8 +25,10 @@ class ThemeNotifier extends Notifier<ThemeMode> {
           state = ThemeMode.dark;
           break;
         default:
-          state = ThemeMode.system;
+          state = ThemeMode.light; // Default to Light if unknown
       }
+    } else {
+      state = ThemeMode.light; // Default to Light if no preference saved
     }
   }
 

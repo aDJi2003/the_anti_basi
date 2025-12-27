@@ -11,11 +11,12 @@ class RecipePreviewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final state = ref.watch(recipeControllerProvider);
     final controller = ref.read(recipeControllerProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -70,14 +71,15 @@ class _PreviewHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.scaffoldBackgroundColor,
         border: Border(
           bottom: BorderSide(
-            color: AppColors.gray100,
+            color: theme.dividerColor,
             width: 1,
           ),
         ),
@@ -87,7 +89,7 @@ class _PreviewHeader extends StatelessWidget {
           IconButton(
             onPressed: onBack,
             icon: const Icon(Icons.arrow_back_rounded),
-            color: AppColors.textPrimary,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -98,13 +100,13 @@ class _PreviewHeader extends StatelessWidget {
                   'Generated Recipes',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                   ),
                 ),
                 Text(
                   '$selectedCount of $totalCount selected',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -123,6 +125,7 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Center(
       child: Padding(
@@ -134,12 +137,12 @@ class _EmptyState extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.gray100,
+                color: isDark ? AppColors.darkSurfaceLight : AppColors.gray100,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.restaurant_menu_rounded,
-                color: AppColors.gray400,
+                color: isDark ? AppColors.darkTextSecondary : AppColors.gray400,
                 size: 40,
               ),
             ),
@@ -148,14 +151,14 @@ class _EmptyState extends StatelessWidget {
               'No Recipes Found',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Could not find recipes for your available ingredients',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
+                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -183,6 +186,7 @@ class _PreviewContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return CustomScrollView(
       slivers: [
@@ -193,7 +197,7 @@ class _PreviewContent extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.blueLight,
+                color: isDark ? AppColors.blue.withAlpha(26) : AppColors.blueLight,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: AppColors.blue.withAlpha(51),
@@ -223,13 +227,13 @@ class _PreviewContent extends StatelessWidget {
                           'AI found ${recipes.length} recipes',
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.blue,
+                            color: isDark ? AppColors.blue.withAlpha(230) : AppColors.blue,
                           ),
                         ),
                         Text(
                           'Based on your fridge ingredients',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.blue.withAlpha(179),
+                            color: isDark ? AppColors.blue.withAlpha(150) : AppColors.blue.withAlpha(179),
                           ),
                         ),
                       ],
@@ -249,7 +253,7 @@ class _PreviewContent extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.orangeLight,
+                  color: isDark ? AppColors.orange.withAlpha(26) : AppColors.orangeLight,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: AppColors.orange.withAlpha(51),
@@ -267,7 +271,7 @@ class _PreviewContent extends StatelessWidget {
                       child: Text(
                         'Priority: ${expiringItemNames.join(", ")} (expiring soon)',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.orange,
+                          color: isDark ? AppColors.orange.withAlpha(230) : AppColors.orange,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -286,7 +290,7 @@ class _PreviewContent extends StatelessWidget {
               'SELECT RECIPES TO SAVE',
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.textMuted,
+                color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                 letterSpacing: 0.5,
               ),
             ),
@@ -330,11 +334,12 @@ class _GeneratedRecipeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Material(
-        color: AppColors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
         elevation: 0,
         child: Container(
@@ -343,7 +348,7 @@ class _GeneratedRecipeTile extends StatelessWidget {
             border: Border.all(
               color: recipe.isSelected
                   ? AppColors.purple.withAlpha(128)
-                  : AppColors.gray200,
+                  : theme.dividerColor,
               width: recipe.isSelected ? 2 : 1,
             ),
           ),
@@ -369,7 +374,7 @@ class _GeneratedRecipeTile extends StatelessWidget {
                         border: Border.all(
                           color: recipe.isSelected
                               ? AppColors.purple
-                              : AppColors.gray300,
+                              : isDark ? AppColors.darkBorder : AppColors.gray300,
                           width: 2,
                         ),
                       ),
@@ -377,7 +382,7 @@ class _GeneratedRecipeTile extends StatelessWidget {
                           ? const Icon(
                               Icons.check_rounded,
                               size: 16,
-                              color: AppColors.white,
+                              color: Colors.white,
                             )
                           : null,
                     ),
@@ -394,7 +399,7 @@ class _GeneratedRecipeTile extends StatelessWidget {
                           recipe.name,
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -405,13 +410,13 @@ class _GeneratedRecipeTile extends StatelessWidget {
                             Icon(
                               Icons.schedule_rounded,
                               size: 14,
-                              color: AppColors.textMuted,
+                              color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               recipe.cookTimeDisplay,
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: AppColors.textMuted,
+                                color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -445,7 +450,7 @@ class _GeneratedRecipeTile extends StatelessWidget {
                               Text(
                                 'Uses:',
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: AppColors.textMuted,
+                                  color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                                 ),
                               ),
                               ...recipe.usesExpiringItems.map((item) {
@@ -455,7 +460,7 @@ class _GeneratedRecipeTile extends StatelessWidget {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.tealLight,
+                                    color: isDark ? AppColors.teal.withAlpha(26) : AppColors.tealLight,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Row(
@@ -487,7 +492,7 @@ class _GeneratedRecipeTile extends StatelessWidget {
                   // Arrow
                   Icon(
                     Icons.chevron_right_rounded,
-                    color: AppColors.gray400,
+                    color: isDark ? AppColors.darkTextMuted : AppColors.gray400,
                   ),
                 ],
               ),
@@ -514,6 +519,7 @@ class _PreviewBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final hasSelection = selectedCount > 0;
 
     return Container(
@@ -524,10 +530,10 @@ class _PreviewBottomBar extends StatelessWidget {
         bottom: MediaQuery.of(context).padding.bottom + 16,
       ),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(13),
+            color: Colors.black.withAlpha(isDark ? 51 : 13),
             blurRadius: 10,
             offset: const Offset(0, -4),
           ),
@@ -567,12 +573,12 @@ class _PreviewBottomBar extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: hasSelection && !isLoading ? onSave : null,
               icon: isLoading
-                  ? SizedBox(
+                  ? const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: AppColors.white,
+                        color: Colors.white,
                       ),
                     )
                   : const Icon(Icons.bookmark_add_rounded),
@@ -584,12 +590,12 @@ class _PreviewBottomBar extends StatelessWidget {
                         : 'Select Recipes to Save',
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: hasSelection ? AppColors.white : AppColors.textMuted,
+                  color: hasSelection ? Colors.white : (isDark ? AppColors.darkTextMuted : AppColors.textMuted),
                 ),
               ),
               style: FilledButton.styleFrom(
                 backgroundColor:
-                    hasSelection ? AppColors.purple : AppColors.gray200,
+                    hasSelection ? AppColors.purple : (isDark ? AppColors.darkSurfaceLight : AppColors.gray200),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

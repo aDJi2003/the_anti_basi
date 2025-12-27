@@ -59,6 +59,7 @@ class _HomeRecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: onTap,
@@ -66,7 +67,7 @@ class _HomeRecipeCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -105,7 +106,7 @@ class _HomeRecipeCard extends StatelessWidget {
                     recipe.name,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -118,16 +119,16 @@ class _HomeRecipeCard extends StatelessWidget {
                       Icon(
                         Icons.schedule_rounded,
                         size: 14,
-                        color: AppColors.textMuted,
+                        color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         recipe.cookTimeDisplay,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.textMuted,
+                          color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                         ),
                       ),
-                      _buildDot(),
+                      _buildDot(isDark),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 6,
@@ -158,7 +159,7 @@ class _HomeRecipeCard extends StatelessWidget {
             // Arrow
             Icon(
               Icons.chevron_right_rounded,
-              color: AppColors.gray400,
+              color: isDark ? AppColors.darkTextMuted : AppColors.gray400,
             ),
           ],
         ),
@@ -166,13 +167,13 @@ class _HomeRecipeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDot() {
+  Widget _buildDot(bool isDark) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
       child: Text(
         '•',
         style: TextStyle(
-          color: AppColors.textMuted,
+          color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
           fontSize: 12,
         ),
       ),
@@ -189,6 +190,7 @@ class _IngredientBadges extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Row(
       children: [
@@ -215,7 +217,7 @@ class _IngredientBadges extends StatelessWidget {
           _buildBadge(
             icon: Icons.help_outline_rounded,
             text: '${summary.missing}',
-            color: AppColors.gray500,
+            color: isDark ? AppColors.darkTextSecondary : AppColors.gray500,
             theme: theme,
           ),
         ],
