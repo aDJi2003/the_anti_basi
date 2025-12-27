@@ -14,6 +14,30 @@
       },
       "oauth_client": [
         {
+          "client_id": "632387181624-hldpul9j3mm1pqv0otpnjiuph88b6e6b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.innovhack.the_anti_basi",
+            "certificate_hash": "4b5b4b30db213b57b744b76c14d622b4d370fba1"
+          }
+        },
+        {
+          "client_id": "632387181624-q5bro92t3nra54alhchb8d4ascmu7kf3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.innovhack.the_anti_basi",
+            "certificate_hash": "34ad705e15391fcf8e63c2133d3f119a7739a804"
+          }
+        },
+        {
+          "client_id": "632387181624-uvkeo361s07plppbcdt9icddbvvlkt41.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.innovhack.the_anti_basi",
+            "certificate_hash": "90670b0fbc34db56ff4cc4b3d143dc1b6ac6ead0"
+          }
+        },
+        {
           "client_id": "632387181624-bqoimagck4mh2ap1likqan07e753lspt.apps.googleusercontent.com",
           "client_type": 3
         }

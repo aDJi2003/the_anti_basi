@@ -5,6 +5,7 @@ import '../../../config/routes.dart';
 import '../../../data/models/inventory_item.dart';
 import '../../../data/models/recipe.dart';
 import '../../../data/models/recipe_ingredient_display.dart';
+import '../../../data/providers/auth_state_provider.dart';
 import '../../../data/repositories/inventory_repository.dart';
 import '../../../data/repositories/recipe_repository.dart';
 import '../../../data/services/gemini_service.dart';
@@ -68,15 +69,15 @@ class RecipeState {
 
 /// Recipe controller using Riverpod Notifier pattern
 class RecipeController extends Notifier<RecipeState> {
-  late final RecipeRepository _recipeRepository;
-  late final InventoryRepository _inventoryRepository;
-  late final GeminiService _geminiService;
+  // Use getters instead of late final to support rebuild
+  RecipeRepository get _recipeRepository => ref.read(recipeRepositoryProvider);
+  InventoryRepository get _inventoryRepository => ref.read(inventoryRepositoryProvider);
+  GeminiService get _geminiService => ref.read(geminiServiceProvider);
 
   @override
   RecipeState build() {
-    _recipeRepository = ref.watch(recipeRepositoryProvider);
-    _inventoryRepository = ref.watch(inventoryRepositoryProvider);
-    _geminiService = ref.watch(geminiServiceProvider);
+    // Watch auth state - this causes rebuild when user changes
+    ref.watch(currentUserIdProvider);
 
     // Load initial data
     _loadData();

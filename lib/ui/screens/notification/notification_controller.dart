@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/app_notification.dart';
+import '../../../data/providers/auth_state_provider.dart';
 
 /// State for notifications
 class NotificationState {
@@ -41,6 +42,8 @@ class NotificationState {
 class NotificationController extends Notifier<NotificationState> {
   @override
   NotificationState build() {
+    // Watch auth state - this causes rebuild when user changes
+    ref.watch(currentUserIdProvider);
     Future.microtask(() => _loadNotifications());
     return const NotificationState(isLoading: true);
   }

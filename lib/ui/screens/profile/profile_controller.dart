@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/routes.dart';
 import '../../../data/models/user_profile.dart';
+import '../../../data/providers/auth_state_provider.dart';
 import '../../../data/repositories/user_repository.dart';
 
 /// Profile screen state
@@ -42,6 +43,8 @@ class ProfileState {
 class ProfileController extends Notifier<ProfileState> {
   @override
   ProfileState build() {
+    // Watch auth state - this causes rebuild when user changes
+    ref.watch(currentUserIdProvider);
     _loadProfile();
     return const ProfileState(isLoading: true);
   }
@@ -130,6 +133,8 @@ class ProfileController extends Notifier<ProfileState> {
 
     if (confirmed == true && context.mounted) {
       await _userRepo.signOut();
+      // Providers will be invalidated on next login, not here
+      // (invalidating here can cause error state when user is null)
       if (context.mounted) {
         context.go(Routes.login);
       }

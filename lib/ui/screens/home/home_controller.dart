@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/routes.dart';
 import '../../../data/models/inventory_item.dart';
+import '../../../data/providers/auth_state_provider.dart';
 import '../../../data/repositories/inventory_repository.dart';
 import '../../../data/repositories/user_repository.dart';
 
@@ -71,6 +72,8 @@ class HomeState {
 class HomeController extends Notifier<HomeState> {
   @override
   HomeState build() {
+    // Watch auth state - this causes rebuild when user changes
+    ref.watch(currentUserIdProvider);
     _loadData();
     return const HomeState(isLoading: true);
   }

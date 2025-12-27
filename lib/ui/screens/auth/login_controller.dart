@@ -43,9 +43,9 @@ class LoginController extends Notifier<LoginState> {
         email: email,
         password: password,
       );
-      
+
       state = state.copyWith(isLoading: false);
-      
+
       if (context.mounted) {
         context.go(Routes.home);
       }
