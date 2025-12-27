@@ -30,7 +30,7 @@ class InventoryItemTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Category icon - uses ItemCategory enum for consistency
+            // Category icon
             Container(
               width: 40,
               height: 40,
@@ -52,7 +52,7 @@ class InventoryItemTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.name,
+                    item.displayName, 
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: context.colors.textPrimary,
@@ -118,8 +118,12 @@ class InventoryItemTile extends StatelessWidget {
 
   String _getDaysText(int days) {
     if (days < 0) return 'Expired';
-    if (days == 0) return 'Today';
-    if (days == 1) return '1 Day';
-    return '$days Days';
+
+    int visualDays = days - 1;
+
+    if (visualDays <= 0) return 'Today';
+    
+    if (visualDays == 1) return '1 Day';
+    return '$visualDays Days';
   }
 }
