@@ -52,7 +52,7 @@ class InventoryItemTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.displayName, 
+                    item.displayName,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: context.colors.textPrimary,
@@ -74,7 +74,8 @@ class InventoryItemTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  _getDaysText(item.daysUntilExpiry),
+                  // KEMBALI KE LOGIKA ASLI (Tanpa dikurangi 1)
+                  _getDaysText(item.daysUntilExpiry), 
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: statusColor,
@@ -118,12 +119,8 @@ class InventoryItemTile extends StatelessWidget {
 
   String _getDaysText(int days) {
     if (days < 0) return 'Expired';
-
-    int visualDays = days - 1;
-
-    if (visualDays <= 0) return 'Today';
-    
-    if (visualDays == 1) return '1 Day';
-    return '$visualDays Days';
+    if (days == 0) return 'Today';
+    if (days == 1) return '1 Day';
+    return '$days Days';
   }
 }
