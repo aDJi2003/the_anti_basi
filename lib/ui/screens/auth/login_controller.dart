@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../config/routes.dart';
 
-/// Login screen state
 class LoginState {
   const LoginState({
     this.isLoading = false,
@@ -30,12 +30,10 @@ class LoginState {
   }
 }
 
-/// Login controller - handles authentication logic
 class LoginController extends Notifier<LoginState> {
   @override
   LoginState build() => const LoginState();
 
-  /// Login with email and password
   Future<void> login(String email, String password, BuildContext context) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
@@ -68,7 +66,6 @@ class LoginController extends Notifier<LoginState> {
     }
   }
 
-  /// Login with Google
   Future<void> loginWithGoogle(BuildContext context) async {
     state = state.copyWith(isGoogleLoading: true, errorMessage: null);
 
@@ -88,7 +85,14 @@ class LoginController extends Notifier<LoginState> {
         idToken: googleAuth.idToken,
       );
 
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      final UserCredential userCredential = 
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      
+      final User? user = userCredential.user;
+
+      if (user != null) {
+        await _checkAndCreateUserInFirestore(user);
+      }
 
       state = state.copyWith(isGoogleLoading: false);
 
@@ -101,6 +105,30 @@ class LoginController extends Notifier<LoginState> {
       if (context.mounted) {
         _showErrorSnackBar(context, 'Google Sign In Error: $e');
       }
+    }
+  }
+
+  Future<void> _checkAndCreateUserInFirestore(User user) async {
+    try {
+      final userDocRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final docSnapshot = await userDocRef.get();
+
+      if (!docSnapshot.exists) {
+        await userDocRef.set({
+          'uid': user.uid,
+          'email': user.email,
+          'displayName': user.displayName ?? 'User',
+          'photoURL': user.photoURL,
+          'createdAt': FieldValue.serverTimestamp(),
+          'preferences': {
+            'dietaryRestrictions': [],
+            'cookingSkill': 'beginner', 
+            'notificationEnabled': true,
+          }
+        });
+      }
+    } catch (e) {
+      print("Error creating user in Firestore: $e");
     }
   }
 
