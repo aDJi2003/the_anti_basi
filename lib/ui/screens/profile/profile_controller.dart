@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../config/routes.dart';
 import '../../../data/models/user_profile.dart';
 import '../../../data/providers/auth_state_provider.dart';
@@ -84,8 +87,54 @@ class ProfileController extends Notifier<ProfileState> {
   }
 
   /// Edit name
-  void onEditName(BuildContext context) {
-    _showSnackBar(context, 'Edit name coming soon');
+  Future<void> onEditName(BuildContext context) async {
+    final currentName = state.user?.displayName ?? '';
+    final controller = TextEditingController(text: currentName);
+
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Name'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Display Name',
+            hintText: 'Enter your name',
+          ),
+          textCapitalization: TextCapitalization.words,
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (newName != null && newName.isNotEmpty && newName != currentName) {
+      try {
+        state = state.copyWith(isLoading: true);
+        await _userRepo.updateDisplayName(newName);
+        await _loadProfile(); // Reload to get fresh data
+        if (context.mounted) {
+          _showSnackBar(context, 'Name updated successfully');
+        }
+      } catch (e) {
+        state = state.copyWith(isLoading: false, errorMessage: e.toString());
+        if (context.mounted) {
+          _showSnackBar(context, 'Failed to update name');
+        }
+      } finally {
+        // Ensure loading state is cleared if not already done by _loadProfile
+        if (state.isLoading) state = state.copyWith(isLoading: false);
+      }
+    }
   }
 
   /// Edit email
@@ -142,8 +191,64 @@ class ProfileController extends Notifier<ProfileState> {
   }
 
   /// Edit avatar
-  void onEditAvatar(BuildContext context) {
-    _showSnackBar(context, 'Edit avatar coming soon');
+  Future<void> onEditAvatar(BuildContext context) async {
+    final picker = ImagePicker();
+    
+    // Show modal bottom sheet to choose source (Camera or Gallery)
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take a photo'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from gallery'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (source == null) return;
+
+    try {
+      final XFile? image = await picker.pickImage(
+        source: source,
+        maxWidth: 512, // Resize to save bandwidth/storage
+        maxHeight: 512,
+        imageQuality: 70,
+      );
+
+      if (image == null) return;
+
+      state = state.copyWith(isLoading: true);
+      
+      // 1. Upload image
+      final downloadUrl = await _userRepo.uploadProfileImage(File(image.path));
+      
+      // 2. Update profile with new URL
+      await _userRepo.updatePhotoURL(downloadUrl);
+      
+      // 3. Reload profile
+      await _loadProfile();
+      
+      if (context.mounted) {
+        _showSnackBar(context, 'Profile photo updated');
+      }
+    } catch (e) {
+      debugPrint('[ProfileController] Error updating avatar: $e');
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      if (context.mounted) {
+        _showSnackBar(context, 'Failed to update profile photo');
+      }
+    }
   }
 
   void _showSnackBar(BuildContext context, String message) {

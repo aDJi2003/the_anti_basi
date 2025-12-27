@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -10,11 +13,14 @@ class UserRepository {
   UserRepository({
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
+    FirebaseStorage? storage,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance;
+        _auth = auth ?? FirebaseAuth.instance,
+        _storage = storage ?? FirebaseStorage.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
+  final FirebaseStorage _storage;
 
   /// Get current user ID
   String? get _userId => _auth.currentUser?.uid;
@@ -88,6 +94,26 @@ class UserRepository {
   }
 
   // ============ WRITE OPERATIONS ============
+
+  /// Upload profile image and return download URL
+  Future<String> uploadProfileImage(File imageFile) async {
+    final userId = _userId;
+    if (userId == null) throw Exception('User not authenticated');
+
+    try {
+      final ref = _storage.ref().child('users/$userId/profile.jpg');
+      
+      // Upload file
+      final uploadTask = await ref.putFile(imageFile);
+      
+      // Get download URL
+      final downloadURL = await uploadTask.ref.getDownloadURL();
+      return downloadURL;
+    } catch (e) {
+      debugPrint('[UserRepo] ERROR uploading image: $e');
+      throw Exception('Failed to upload image: $e');
+    }
+  }
 
   /// Create or update user profile
   Future<void> saveUserProfile(UserProfile profile) async {
