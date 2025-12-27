@@ -53,11 +53,12 @@ class _ScanResultsScreenState extends ConsumerState<ScanResultsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final state = ref.watch(scanResultsControllerProvider);
     final controller = ref.read(scanResultsControllerProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -130,6 +131,7 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Center(
       child: Padding(
@@ -141,12 +143,12 @@ class _EmptyState extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.gray100,
+                color: isDark ? AppColors.darkSurfaceLight : AppColors.gray100,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.search_off_rounded,
-                color: AppColors.gray400,
+                color: isDark ? AppColors.darkTextSecondary : AppColors.gray400,
                 size: 40,
               ),
             ),
@@ -155,14 +157,14 @@ class _EmptyState extends StatelessWidget {
               'No Items Detected',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Try taking another photo or add items manually',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
+                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -186,6 +188,7 @@ class _ResultsContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return CustomScrollView(
       slivers: [
@@ -213,14 +216,14 @@ class _ResultsContent extends StatelessWidget {
                   'DETECTED ITEMS',
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                     letterSpacing: 1.0,
                   ),
                 ),
                 Text(
                   '${state.selectedCount}/${state.items.length} selected',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
+                    color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                   ),
                 ),
               ],
@@ -247,11 +250,11 @@ class _ResultsContent extends StatelessWidget {
                     onDelete: () => controller.deleteItem(item.id),
                   ),
                   if (index < state.items.length - 1)
-                    const Divider(
+                    Divider(
                       height: 1,
                       indent: 20,
                       endIndent: 20,
-                      color: AppColors.gray100,
+                      color: isDark ? AppColors.darkDivider : AppColors.gray100,
                     ),
                 ],
               );
@@ -288,16 +291,17 @@ class _AddManualItemButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.gray200,
+            color: isDark ? AppColors.darkBorder : AppColors.gray200,
             style: BorderStyle.solid,
           ),
         ),

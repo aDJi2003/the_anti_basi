@@ -19,13 +19,14 @@ class ResultsBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.background.withAlpha(242), // 95%
+        color: theme.scaffoldBackgroundColor.withAlpha(242), // 95%
         border: Border(
-          top: BorderSide(color: AppColors.gray200),
+          top: BorderSide(color: isDark ? AppColors.darkDivider : AppColors.gray200),
         ),
       ),
       child: SafeArea(
@@ -43,7 +44,7 @@ class ResultsBottomBar extends StatelessWidget {
                     Text(
                       'Destination',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -54,13 +55,13 @@ class ResultsBottomBar extends StatelessWidget {
                           destination,
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(width: 4),
-                        const Icon(
+                        Icon(
                           Icons.expand_more_rounded,
-                          color: AppColors.textPrimary,
+                          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                           size: 18,
                         ),
                       ],

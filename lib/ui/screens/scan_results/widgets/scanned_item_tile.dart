@@ -25,6 +25,7 @@ class ScannedItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isExpiringSoon = item.expiryDate != null &&
         item.expiryDate!.difference(DateTime.now()).inDays <= 3;
 
@@ -49,8 +50,9 @@ class ScannedItemTile extends StatelessWidget {
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color:
-                          item.isSelected ? AppColors.primary : AppColors.gray300,
+                      color: item.isSelected
+                          ? AppColors.primary
+                          : (isDark ? AppColors.darkBorder : AppColors.gray300),
                       width: 2,
                     ),
                   ),
@@ -95,16 +97,16 @@ class ScannedItemTile extends StatelessWidget {
                           item.name,
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       GestureDetector(
                         onTap: onDelete,
-                        child: const Icon(
+                        child: Icon(
                           Icons.close_rounded,
-                          color: AppColors.gray400,
+                          color: isDark ? AppColors.darkTextMuted : AppColors.gray400,
                           size: 20,
                         ),
                       ),
@@ -146,7 +148,7 @@ class ScannedItemTile extends StatelessWidget {
                       child: Text(
                         'Could not detect details',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.textMuted,
+                          color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                           fontStyle: FontStyle.italic,
                         ),
                       ),
@@ -173,13 +175,16 @@ class _QuantityInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: 56,
       height: 36,
       decoration: BoxDecoration(
-        color: AppColors.gray50,
+        color: isDark ? AppColors.darkSurfaceLight : AppColors.gray50,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.gray200),
+        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.gray200),
       ),
       child: TextField(
         controller: TextEditingController(
@@ -189,9 +194,10 @@ class _QuantityInput extends StatelessWidget {
         ),
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
-        style: const TextStyle(
+        style: theme.textTheme.bodyMedium?.copyWith(
           fontSize: 13,
           fontWeight: FontWeight.w600,
+          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
         ),
         decoration: const InputDecoration(
           border: InputBorder.none,
@@ -233,28 +239,32 @@ class _UnitSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       height: 36,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        color: AppColors.gray50,
+        color: isDark ? AppColors.darkSurfaceLight : AppColors.gray50,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.gray200),
+        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.gray200),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _availableUnits.contains(value) ? value : 'pcs',
           isDense: true,
-          icon: const Icon(
+          icon: Icon(
             Icons.keyboard_arrow_down_rounded,
             size: 18,
-            color: AppColors.textMuted,
+            color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
           ),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
+            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
           ),
+          dropdownColor: theme.cardColor,
           items: _availableUnits.map((unit) {
             return DropdownMenuItem<String>(
               value: unit,
@@ -284,18 +294,23 @@ class _DateInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final bgColor = isExpiringSoon
-        ? const Color(0xFFFEF2F2) // red-50
-        : AppColors.gray50;
+        ? (isDark ? AppColors.error.withAlpha(26) : const Color(0xFFFEF2F2))
+        : (isDark ? AppColors.darkSurfaceLight : AppColors.gray50);
     final borderColor = isExpiringSoon
-        ? const Color(0xFFFECACA) // red-200
-        : AppColors.gray200;
+        ? (isDark ? AppColors.error.withAlpha(77) : const Color(0xFFFECACA))
+        : (isDark ? AppColors.darkBorder : AppColors.gray200);
     final iconColor = isExpiringSoon
         ? AppColors.error
         : date != null
             ? AppColors.warning
-            : AppColors.textMuted;
-    final textColor = isExpiringSoon ? AppColors.error : AppColors.textSecondary;
+            : (isDark ? AppColors.darkTextMuted : AppColors.textMuted);
+    final textColor = isExpiringSoon
+        ? AppColors.error
+        : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary);
 
     return GestureDetector(
       onTap: onTap,
