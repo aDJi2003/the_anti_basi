@@ -30,7 +30,7 @@ class InventoryItemTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Category icon - uses ItemCategory enum for consistency
+            // Category icon
             Container(
               width: 40,
               height: 40,
@@ -52,7 +52,7 @@ class InventoryItemTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.name,
+                    item.displayName,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: context.colors.textPrimary,
@@ -74,7 +74,8 @@ class InventoryItemTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  _getDaysText(item.daysUntilExpiry),
+                  // KEMBALI KE LOGIKA ASLI (Tanpa dikurangi 1)
+                  _getDaysText(item.daysUntilExpiry), 
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: statusColor,
