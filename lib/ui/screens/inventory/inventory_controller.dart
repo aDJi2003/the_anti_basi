@@ -97,19 +97,39 @@ class InventoryState {
 class InventoryController extends Notifier<InventoryState> {
   @override
   InventoryState build() {
-    // Watch auth state - this causes rebuild when user changes
+    // Watch auth state
     ref.watch(currentUserIdProvider);
-    _loadData();
-    return const InventoryState(isLoading: true);
+
+    // Watch real-time inventory stream
+    final inventoryAsync = ref.watch(inventoryStreamProvider);
+
+    // Update state based on stream data
+    inventoryAsync.when(
+      data: (items) {
+        // We use a post-frame callback or schedule it to avoid updating state during build
+        // but since this is inside build() of a Notifier, and we are returning the state,
+        // we can compute the initial state from the current stream value.
+      },
+      loading: () {},
+      error: (e, _) {},
+    );
+
+    // Return state with current stream data if available
+    return InventoryState(
+      isLoading: inventoryAsync.isLoading,
+      allItems: inventoryAsync.value ?? [],
+      errorMessage: inventoryAsync.hasError ? inventoryAsync.error.toString() : null,
+    );
   }
 
   InventoryRepository get _repository => ref.read(inventoryRepositoryProvider);
 
-  /// Load inventory data from Firestore
+  /// Load inventory data from Firestore (No longer needed as we use stream)
   Future<void> _loadData() async {
+    // This method is now redundant but kept for refresh functionality if needed
+    state = state.copyWith(isLoading: true);
     try {
       final items = await _repository.getInventory();
-
       state = state.copyWith(
         isLoading: false,
         allItems: items,
@@ -124,8 +144,8 @@ class InventoryController extends Notifier<InventoryState> {
 
   /// Refresh data
   Future<void> refresh() async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
-    await _loadData();
+    // With streams, refresh might not be needed, but good for forced sync
+    ref.invalidate(inventoryStreamProvider);
   }
 
   /// Update search query
@@ -161,7 +181,7 @@ class InventoryController extends Notifier<InventoryState> {
   Future<void> deleteItem(String itemId) async {
     try {
       await _repository.deleteItem(itemId);
-      await refresh();
+      // No need to refresh manual, stream will update
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());
     }
@@ -171,7 +191,7 @@ class InventoryController extends Notifier<InventoryState> {
   Future<void> updateItemQuantity(String itemId, double newQuantity) async {
     try {
       await _repository.updateQuantity(itemId, newQuantity);
-      await refresh();
+      // No need to refresh manual, stream will update
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());
     }

@@ -56,6 +56,7 @@ class ScanResultsController extends Notifier<ScanResultsState> {
 
   /// Initialize with items from Gemini scan
   void initializeWithItems(List<ScannedItem> items, {String? imagePath}) {
+    // Prevent double initialization
     if (_isInitialized) return;
     _isInitialized = true;
 
@@ -210,8 +211,9 @@ class ScanResultsController extends Notifier<ScanResultsState> {
 
   /// Change destination
   void changeDestination(BuildContext context) {
-    // TODO: Show destination picker
-    _showSnackBar(context, 'Destination picker coming soon');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Destination picker coming soon')),
+    );
   }
 
   /// Add selected items to inventory
@@ -270,5 +272,5 @@ class ScanResultsController extends Notifier<ScanResultsState> {
 
 /// Provider for scan results controller
 final scanResultsControllerProvider =
-    NotifierProvider<ScanResultsController, ScanResultsState>(
+    NotifierProvider.autoDispose<ScanResultsController, ScanResultsState>(
         ScanResultsController.new);

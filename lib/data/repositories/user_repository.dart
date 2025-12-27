@@ -14,9 +14,9 @@ class UserRepository {
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
     FirebaseStorage? storage,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance,
-        _storage = storage ?? FirebaseStorage.instance;
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _auth = auth ?? FirebaseAuth.instance,
+       _storage = storage ?? FirebaseStorage.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
@@ -101,11 +101,13 @@ class UserRepository {
     if (userId == null) throw Exception('User not authenticated');
 
     try {
-      final ref = _storage.ref().child('users/$userId/profile.jpg');
-      
+      // Store in profiles_images folder with userId as filename
+      // This automatically overwrites (deletes) any existing file with the same name
+      final ref = _storage.ref().child('profile_images/$userId.jpg');
+
       // Upload file
       final uploadTask = await ref.putFile(imageFile);
-      
+
       // Get download URL
       final downloadURL = await uploadTask.ref.getDownloadURL();
       return downloadURL;
@@ -118,10 +120,9 @@ class UserRepository {
   /// Create or update user profile
   Future<void> saveUserProfile(UserProfile profile) async {
     try {
-      await _usersCollection.doc(profile.uid).set(
-            profile.toFirestore(),
-            SetOptions(merge: true),
-          );
+      await _usersCollection
+          .doc(profile.uid)
+          .set(profile.toFirestore(), SetOptions(merge: true));
       debugPrint('[UserRepo] User profile saved');
     } catch (e) {
       debugPrint('[UserRepo] ERROR saving user profile: $e');
