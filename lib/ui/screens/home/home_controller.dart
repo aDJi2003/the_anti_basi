@@ -132,19 +132,6 @@ class HomeController extends Notifier<HomeState> {
     await _loadData();
   }
 
-  /// Handle AI assistant query
-  void onAiQuery(String query, BuildContext context) {
-    // TODO: Implement AI query
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('AI Query: $query'),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
   /// Navigate to inventory
   void navigateToInventory(BuildContext context) {
     context.go(Routes.inventory);

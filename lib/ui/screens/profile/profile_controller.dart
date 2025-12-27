@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../config/routes.dart';
 import '../../../data/models/user_profile.dart';
 import '../../../data/providers/auth_state_provider.dart';
+import '../../../data/providers/theme_provider.dart';
 import '../../../data/repositories/user_repository.dart';
 
 /// Profile screen state
@@ -77,10 +78,9 @@ class ProfileController extends Notifier<ProfileState> {
     await _loadProfile();
   }
 
-  /// Toggle dark mode
-  void toggleDarkMode(bool value) {
-    state = state.copyWith(isDarkMode: value);
-    // TODO: Persist theme preference and update app theme
+  /// Toggle dark mode - uses theme provider for persistence
+  Future<void> toggleDarkMode(bool value) async {
+    await ref.read(themeProvider.notifier).toggleDarkMode(value);
   }
 
   /// Edit name

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 import '../../../../data/models/inventory_item.dart';
 import 'package:intl/intl.dart';
 
@@ -19,7 +20,7 @@ class ExpiringItemCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Material(
-      color: AppColors.white,
+      color: context.colors.surface,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
@@ -28,10 +29,10 @@ class ExpiringItemCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.gray200),
+            border: Border.all(color: context.colors.border),
             boxShadow: [
               BoxShadow(
-                color: AppColors.gray900.withAlpha(8),
+                color: context.colors.textPrimary.withAlpha(8),
                 blurRadius: 4,
                 offset: const Offset(0, 1),
               ),
@@ -52,14 +53,14 @@ class ExpiringItemCard extends StatelessWidget {
                       item.name,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '${item.category.displayName} • ${item.quantityDisplay}',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                         fontSize: 10,
                       ),
                     ),
@@ -167,7 +168,7 @@ class _ExpiryBadge extends StatelessWidget {
         Text(
           DateFormat('h:mm a').format(item.expiryDate),
           style: theme.textTheme.labelSmall?.copyWith(
-            color: AppColors.textMuted,
+            color: context.colors.textMuted,
             fontSize: 10,
             fontWeight: FontWeight.w500,
           ),

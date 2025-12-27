@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/app_colors.dart';
+import '../../../config/app_colors_extension.dart';
 
 /// Reusable text field with label
 /// Follows Material Design 3 guidelines
@@ -65,7 +66,7 @@ class _AppTextFieldState extends State<AppTextField> {
           widget.label,
           style: theme.textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w500,
-            color: AppColors.gray700,
+            color: context.colors.textSecondary,
           ),
         ),
         const SizedBox(height: 6),
@@ -81,15 +82,15 @@ class _AppTextFieldState extends State<AppTextField> {
           onFieldSubmitted: widget.onSubmitted,
           autofillHints: widget.autofillHints,
           style: theme.textTheme.bodyLarge?.copyWith(
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: widget.hint,
             hintStyle: theme.textTheme.bodyLarge?.copyWith(
-              color: AppColors.textMuted,
+              color: context.colors.textMuted,
             ),
             prefixIcon: widget.prefixIcon != null
-                ? Icon(widget.prefixIcon, size: 20, color: AppColors.gray500)
+                ? Icon(widget.prefixIcon, size: 20, color: context.colors.textMuted)
                 : null,
             suffixIcon: widget.showPasswordToggle
                 ? IconButton(
@@ -98,24 +99,24 @@ class _AppTextFieldState extends State<AppTextField> {
                           ? Icons.visibility_outlined
                           : Icons.visibility_off_outlined,
                       size: 20,
-                      color: AppColors.gray400,
+                      color: context.colors.textMuted,
                     ),
                     onPressed: _toggleObscure,
                   )
                 : null,
             filled: true,
-            fillColor: AppColors.white,
+            fillColor: context.colors.surface,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 14,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.gray200),
+              borderSide: BorderSide(color: context.colors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.gray200),
+              borderSide: BorderSide(color: context.colors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),

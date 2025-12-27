@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 import '../../../../data/models/inventory_item.dart';
 import 'inventory_item_tile.dart';
 
@@ -37,7 +38,7 @@ class InventorySection extends StatelessWidget {
                 title.toUpperCase(),
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                   letterSpacing: 1.2,
                 ),
               ),

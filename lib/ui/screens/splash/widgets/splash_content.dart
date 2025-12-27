@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 import '../../../../core/constants.dart';
 
 /// Center content of splash screen (icon, title, tagline)
@@ -24,7 +25,7 @@ class SplashContent extends StatelessWidget {
           AppConstants.appName,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
             letterSpacing: -0.5,
           ),
         ),
@@ -35,7 +36,7 @@ class SplashContent extends StatelessWidget {
           AppConstants.appTagline,
           style: theme.textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
             letterSpacing: 2,
           ),
         ),

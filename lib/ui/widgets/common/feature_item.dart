@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../config/app_colors.dart';
+import '../../../config/app_colors_extension.dart';
 
 /// Feature item widget for displaying features with icon
 /// Used in onboarding/login screens
@@ -27,12 +27,12 @@ class FeatureItem extends StatelessWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: context.colors.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.gray200),
+            border: Border.all(color: context.colors.border),
             boxShadow: [
               BoxShadow(
-                color: AppColors.gray900.withAlpha(8),
+                color: context.colors.textPrimary.withAlpha(8),
                 blurRadius: 4,
                 offset: const Offset(0, 1),
               ),
@@ -41,7 +41,7 @@ class FeatureItem extends StatelessWidget {
           child: Icon(
             icon,
             size: 20,
-            color: AppColors.gray700,
+            color: context.colors.textSecondary,
           ),
         ),
         const SizedBox(width: 16),
@@ -56,14 +56,14 @@ class FeatureItem extends StatelessWidget {
                 title,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 description,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
             ],

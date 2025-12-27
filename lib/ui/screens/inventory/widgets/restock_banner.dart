@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 
 /// Banner prompting user to scan receipt for restocking
 class RestockBanner extends StatelessWidget {
@@ -19,12 +19,12 @@ class RestockBanner extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
             colors: [
-              AppColors.gray900,
-              AppColors.gray700,
+              context.colors.textPrimary,
+              context.colors.darkGrey,
             ],
           ),
           borderRadius: BorderRadius.circular(12),
@@ -40,14 +40,14 @@ class RestockBanner extends StatelessWidget {
                     'Restocked?',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: AppColors.white,
+                      color: context.colors.surface,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Scan receipt to auto-add items.',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.gray400,
+                      color: context.colors.textMuted,
                     ),
                   ),
                 ],
@@ -56,7 +56,7 @@ class RestockBanner extends StatelessWidget {
 
             // Scan button
             Material(
-              color: AppColors.white,
+              color: context.colors.surface,
               borderRadius: BorderRadius.circular(24),
               child: InkWell(
                 onTap: onScanTap,
@@ -65,9 +65,9 @@ class RestockBanner extends StatelessWidget {
                   width: 44,
                   height: 44,
                   alignment: Alignment.center,
-                  child: const Icon(
+                  child: Icon(
                     Icons.document_scanner_outlined,
-                    color: AppColors.gray900,
+                    color: context.colors.textPrimary,
                     size: 22,
                   ),
                 ),

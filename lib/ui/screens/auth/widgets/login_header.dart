@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 import '../../../../core/constants.dart';
 
 /// Login screen header with app icon, name, and tagline
@@ -22,7 +23,7 @@ class LoginHeader extends StatelessWidget {
           AppConstants.appName,
           style: theme.textTheme.headlineLarge?.copyWith(
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
             letterSpacing: -0.5,
           ),
         ),
@@ -32,14 +33,14 @@ class LoginHeader extends StatelessWidget {
         Text(
           'Stop wasting food.',
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           'Start managing your fridge smarter.',
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
       ],

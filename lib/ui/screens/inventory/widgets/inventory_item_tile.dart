@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 import '../../../../data/models/inventory_item.dart';
 
 /// Individual inventory item tile with expiry status
@@ -23,9 +24,9 @@ class InventoryItemTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: context.colors.surface,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.colors.border),
         ),
         child: Row(
           children: [
@@ -54,14 +55,14 @@ class InventoryItemTile extends StatelessWidget {
                     item.name,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     'Qty: ${_formatQuantity(item.quantity)} ${item.unit}',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
@@ -83,7 +84,7 @@ class InventoryItemTile extends StatelessWidget {
                 Text(
                   'left',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                     fontSize: 10,
                   ),
                 ),

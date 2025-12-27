@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/app_colors.dart';
+import '../../../config/app_colors_extension.dart';
 import '../../screens/notification/notification_controller.dart';
 import 'notification_sheet.dart';
 
@@ -22,10 +23,10 @@ class NotificationButton extends ConsumerWidget {
             hasUnread
                 ? Icons.notifications_active_outlined
                 : Icons.notifications_outlined,
-            color: AppColors.darkGrey,
+            color: context.colors.darkGrey,
           ),
           style: IconButton.styleFrom(
-            backgroundColor: AppColors.lightGrey,
+            backgroundColor: context.colors.lightGrey,
             padding: const EdgeInsets.all(12),
           ),
         ),

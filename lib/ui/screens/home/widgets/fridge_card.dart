@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 
 /// Hero card showing fridge overview with background image
 class FridgeCard extends StatelessWidget {
@@ -26,10 +27,10 @@ class FridgeCard extends StatelessWidget {
         height: 176,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: AppColors.gray900,
+          color: context.colors.darkGrey,
           boxShadow: [
             BoxShadow(
-              color: AppColors.gray900.withAlpha(40),
+              color: context.colors.darkGrey.withAlpha(40),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -48,11 +49,11 @@ class FridgeCard extends StatelessWidget {
                   errorBuilder: (context, error, stackTrace) {
                     debugPrint('Fridge image error: $error');
                     return Container(
-                      color: AppColors.gray700,
-                      child: const Center(
+                      color: context.colors.darkGrey,
+                      child: Center(
                         child: Icon(
                           Icons.image_not_supported,
-                          color: AppColors.gray400,
+                          color: context.colors.textMuted,
                           size: 48,
                         ),
                       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 
 /// AI Kitchen Assistant card with input field
 class AiAssistantCard extends StatelessWidget {
@@ -26,7 +27,7 @@ class AiAssistantCard extends StatelessWidget {
             children: [
               Icon(
                 Icons.smart_toy_outlined,
-                color: AppColors.primary,
+                color: context.colors.primary,
                 size: 22,
               ),
               const SizedBox(width: 8),
@@ -34,7 +35,7 @@ class AiAssistantCard extends StatelessWidget {
                 'AI Kitchen Assistant',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
             ],
@@ -45,12 +46,12 @@ class AiAssistantCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: context.colors.surface,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.gray200),
+              border: Border.all(color: context.colors.border),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.gray900.withAlpha(8),
+                  color: context.colors.textPrimary.withAlpha(8),
                   blurRadius: 4,
                   offset: const Offset(0, 1),
                 ),
@@ -62,7 +63,7 @@ class AiAssistantCard extends StatelessWidget {
                 Text(
                   'Chef AI: What are we cooking today?',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -124,9 +125,9 @@ class _AiInputFieldState extends State<_AiInputField> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.gray50,
+        color: context.colors.inputBackground,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.gray200),
+        border: Border.all(color: context.colors.border),
       ),
       child: Row(
         children: [
@@ -137,7 +138,7 @@ class _AiInputFieldState extends State<_AiInputField> {
               decoration: InputDecoration(
                 hintText: "Tell AI what's in your hand to get a recipe...",
                 hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textMuted,
+                  color: context.colors.textMuted,
                 ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(

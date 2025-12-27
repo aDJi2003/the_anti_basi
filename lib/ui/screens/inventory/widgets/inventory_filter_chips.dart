@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 
 /// Filter type for inventory
 enum InventoryFilter {
@@ -70,16 +70,16 @@ class _FilterChip extends StatelessWidget {
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.gray900 : Colors.transparent,
+          color: isSelected ? context.colors.textPrimary : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: isSelected ? AppColors.gray900 : AppColors.border,
+            color: isSelected ? context.colors.textPrimary : context.colors.border,
           ),
         ),
         child: Text(
           label,
           style: theme.textTheme.labelLarge?.copyWith(
-            color: isSelected ? AppColors.white : AppColors.textSecondary,
+            color: isSelected ? context.colors.surface : context.colors.textSecondary,
             fontWeight: FontWeight.w500,
           ),
         ),

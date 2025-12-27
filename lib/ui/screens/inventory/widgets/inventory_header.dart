@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 
 /// Inventory screen header with title and optional action
 class InventoryHeader extends StatelessWidget {
@@ -30,13 +30,13 @@ class InventoryHeader extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: context.colors.surface,
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.gray100),
+                  border: Border.all(color: context.colors.border),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back_ios_new_rounded,
-                  color: AppColors.gray700,
+                  color: context.colors.textSecondary,
                   size: 18,
                 ),
               ),
@@ -50,7 +50,7 @@ class InventoryHeader extends StatelessWidget {
               title,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
           ),

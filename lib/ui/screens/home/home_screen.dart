@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:the_anti_basi/config/app_colors.dart';
+import 'package:the_anti_basi/config/app_colors_extension.dart';
 import 'package:the_anti_basi/ui/screens/recipe/recipe_controller.dart';
 import 'package:the_anti_basi/ui/screens/recipe/widgets/recipe_suggestion.dart';
 import 'home_controller.dart';
@@ -92,7 +93,7 @@ class HomeScreen extends ConsumerWidget {
                             'Recipe Suggestions',
                             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.darkGrey,
+                                  color: context.colors.darkGrey,
                                 ),
                           ),
                           TextButton(

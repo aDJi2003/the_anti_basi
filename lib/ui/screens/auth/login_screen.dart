@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../config/app_colors.dart';
+import '../../../config/app_colors_extension.dart';
 import 'login_controller.dart';
 import 'widgets/login_features.dart';
 import 'widgets/login_form.dart';
@@ -17,7 +17,7 @@ class LoginScreen extends ConsumerWidget {
     final controller = ref.read(loginControllerProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

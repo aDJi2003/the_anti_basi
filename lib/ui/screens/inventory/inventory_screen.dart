@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../config/app_colors.dart';
+import '../../../config/app_colors_extension.dart';
 import '../../widgets/common/notification_button.dart';
 import 'inventory_controller.dart';
 import 'widgets/inventory_filter_chips.dart';
@@ -38,7 +38,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
           ? const _LoadingState()
           : RefreshIndicator(
               onRefresh: controller.refresh,
-              color: AppColors.primary,
+              color: context.colors.primary,
               child: CustomScrollView(
                 slivers: [
                   // Header
@@ -127,9 +127,9 @@ class _LoadingState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: CircularProgressIndicator(
-        color: AppColors.primary,
+        color: context.colors.primary,
       ),
     );
   }
@@ -150,13 +150,13 @@ class _EmptyState extends StatelessWidget {
           Container(
             width: 80,
             height: 80,
-            decoration: const BoxDecoration(
-              color: AppColors.gray100,
+            decoration: BoxDecoration(
+              color: context.colors.inputBackground,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.inventory_2_outlined,
-              color: AppColors.gray400,
+              color: context.colors.textMuted,
               size: 40,
             ),
           ),
@@ -165,14 +165,14 @@ class _EmptyState extends StatelessWidget {
             'No items found',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             'Try adjusting your search or filter',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ],
