@@ -4,13 +4,13 @@ import 'app_colors.dart';
 /// Extension on BuildContext to get theme-aware colors
 /// Usage: context.colors.background instead of AppColors.background
 extension AppColorsExtension on BuildContext {
-  _ThemedColors get colors => _ThemedColors(this);
+  ThemedColors get colors => ThemedColors(this);
 }
 
-class _ThemedColors {
+class ThemedColors {
   final BuildContext context;
 
-  _ThemedColors(this.context);
+  ThemedColors(this.context);
 
   bool get _isDark => Theme.of(context).brightness == Brightness.dark;
 

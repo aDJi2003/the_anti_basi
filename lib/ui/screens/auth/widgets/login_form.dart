@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../config/app_colors.dart';
 import '../../../../config/app_colors_extension.dart';
 import '../../../widgets/common/common.dart';
 
@@ -115,7 +114,7 @@ class _LoginFormState extends State<LoginForm> {
                 child: Text(
                   'Sign up',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.primary,
+                    color: context.colors.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
