@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../config/app_colors_extension.dart';
 import '../../../../data/models/recipe.dart';
 import '../../../../data/models/recipe_ingredient_display.dart';
 import '../recipe_controller.dart';
@@ -25,7 +26,7 @@ class RecipeSuggestion extends ConsumerWidget {
     }
 
     if (state.savedRecipes.isEmpty) {
-      return const SizedBox.shrink();
+      return const _RecipeEmptyState();
     }
 
     // Show max 3 recipes on home screen
@@ -40,6 +41,62 @@ class RecipeSuggestion extends ConsumerWidget {
           onTap: () => controller.navigateToDetail(context, recipe),
         );
       }).toList(),
+    );
+  }
+}
+
+/// Empty state for recipe suggestions
+class _RecipeEmptyState extends StatelessWidget {
+  const _RecipeEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+      decoration: BoxDecoration(
+        color: context.colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: context.colors.border),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: context.colors.orange.withAlpha(26),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.menu_book_rounded,
+              size: 28,
+              color: context.colors.orange,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No recipes yet',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: context.colors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Generate recipes based on your\nexpiring ingredients above!',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: context.colors.textSecondary,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

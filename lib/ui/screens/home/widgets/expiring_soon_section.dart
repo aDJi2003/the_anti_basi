@@ -154,32 +154,44 @@ class _EmptyState extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
       decoration: BoxDecoration(
         color: context.colors.surface,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: context.colors.border),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.check_circle_outline_rounded,
-            size: 40,
-            color: context.colors.primary.withAlpha(153),
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: context.colors.primary.withAlpha(26),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.check_circle_rounded,
+              size: 32,
+              color: context.colors.primary,
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Text(
             'All good!',
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
               color: context.colors.textPrimary,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
-            'No items expiring soon',
+            'No items expiring soon.\nYour fridge is in great shape!',
+            textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               color: context.colors.textSecondary,
+              height: 1.4,
             ),
           ),
         ],
