@@ -85,8 +85,6 @@ class _ScanResultsScreenState extends ConsumerState<ScanResultsScreen> {
 
             // Bottom bar
             ResultsBottomBar(
-              destination: state.destination,
-              onDestinationTap: () => controller.changeDestination(context),
               onAddToInventory: () => controller.addToInventory(context),
               isLoading: state.isSaving,
             ),

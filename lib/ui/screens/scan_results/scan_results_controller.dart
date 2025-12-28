@@ -14,14 +14,12 @@ class ScanResultsState {
     this.isSaving = false,
     this.items = const [],
     this.sourceImages = const [],
-    this.destination = 'Main Fridge',
   });
 
   final bool isLoading;
   final bool isSaving;
   final List<ScannedItem> items;
   final List<String> sourceImages;
-  final String destination;
 
   /// Count of selected items
   int get selectedCount => items.where((i) => i.isSelected).length;
@@ -31,14 +29,12 @@ class ScanResultsState {
     bool? isSaving,
     List<ScannedItem>? items,
     List<String>? sourceImages,
-    String? destination,
   }) {
     return ScanResultsState(
       isLoading: isLoading ?? this.isLoading,
       isSaving: isSaving ?? this.isSaving,
       items: items ?? this.items,
       sourceImages: sourceImages ?? this.sourceImages,
-      destination: destination ?? this.destination,
     );
   }
 }
@@ -207,13 +203,6 @@ class ScanResultsController extends Notifier<ScanResultsState> {
     if (result != null) {
       state = state.copyWith(items: [...state.items, result]);
     }
-  }
-
-  /// Change destination
-  void changeDestination(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Destination picker coming soon')),
-    );
   }
 
   /// Add selected items to inventory
