@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/date_utils.dart' as app_date;
 import '../../../data/models/app_notification.dart';
 import '../../../data/providers/auth_state_provider.dart';
 
@@ -66,19 +67,18 @@ class NotificationController extends Notifier<NotificationState> {
           .get();
 
       final List<AppNotification> generatedNotifications = [];
-      final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
-      
+
       for (var doc in snapshot.docs) {
         final data = doc.data();
-        
+
         if (data['expiryDate'] != null) {
           final Timestamp expiryTs = data['expiryDate'];
           final DateTime expiryDate = expiryTs.toDate();
           final String itemName = data['displayName'] ?? data['name'] ?? 'Item';
           final String itemId = doc.id;
 
-          final difference = expiryDate.difference(today).inDays;
+          // Use centralized date utility for consistent calculations
+          final difference = app_date.DateUtils.daysUntilExpiry(expiryDate);
 
           if (difference <= 3 && difference >= 0) {
             final title = 'Waspada Bahan Makanan!';

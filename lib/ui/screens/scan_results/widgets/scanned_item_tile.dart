@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../config/app_colors.dart';
+import '../../../../core/date_utils.dart' as app_date;
 import '../../../../data/models/scanned_item.dart';
 
 /// Individual scanned item tile with checkbox, qty, unit, and date
@@ -26,8 +27,7 @@ class ScannedItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final isExpiringSoon = item.expiryDate != null &&
-        item.expiryDate!.difference(DateTime.now()).inDays <= 3;
+    final isExpiringSoon = app_date.DateUtils.isExpiringSoon(item.expiryDate);
 
     return Opacity(
       opacity: item.isUnknown ? 0.5 : 1.0,
@@ -351,12 +351,11 @@ class _DateInput extends StatelessWidget {
     if (date == null) return 'Set date';
     if (isExpiringSoon) return 'Expires Soon';
 
-    final now = DateTime.now();
-    final diff = date.difference(now).inDays;
+    final days = app_date.DateUtils.daysUntilExpiry(date);
 
-    if (diff == 0) return 'Today';
-    if (diff == 1) return 'Tomorrow';
-    if (diff < 7) return 'In $diff days';
+    if (days == 0) return 'Today';
+    if (days == 1) return 'Tomorrow';
+    if (days < 7) return 'In $days days';
 
     return DateFormat('MMM d, y').format(date);
   }
