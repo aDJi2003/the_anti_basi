@@ -77,44 +77,62 @@ class GeminiService {
 
       debugPrint('[GeminiService] Image size: ${imageBytes.length} bytes, type: $mimeType');
 
-      // ROBUST PROMPT - Anti-hallucination (from plan.md)
+      // ROBUST PROMPT - Anti-hallucination + Safety filter
       const prompt = '''
-You are a food recognition assistant. Analyze this image and identify food items.
+You are a STRICT food recognition assistant for a fridge management app.
+Analyze this image and identify ONLY legitimate food/grocery items that belong in a refrigerator.
 
-RULES:
+CRITICAL SAFETY RULES (MUST FOLLOW):
+1. ONLY detect food, beverages, and normal grocery items that belong in a fridge
+2. IMMEDIATELY REJECT and return empty array if you detect:
+   - Weapons, explosives, bombs, ammunition
+   - Poisons, toxic substances, chemicals, cleaning products
+   - Drugs, medications, pharmaceuticals
+   - Non-food objects (electronics, tools, toys, etc.)
+   - Inappropriate or offensive content
+   - Anything that is NOT a legitimate grocery/food item
+3. When in doubt, DO NOT include the item - safety first!
+
+DETECTION RULES:
 1. Only identify items you are 90%+ confident about
 2. If unsure between similar items, use generic category name
-3. DO NOT guess quantity or weight - always return quantity as 1
-4. Use English food names in lowercase
-5. If item is packaged with visible label, use the label name
-6. If no food items detected, return empty array
+3. Use English food names in lowercase
+4. If item is packaged with visible label, use the label name
+5. If no valid food items detected, return empty array
 
-CATEGORIES (use exactly these):
-- protein (meat, eggs, tofu, tempeh, fish, chicken, beef)
-- vegetable (all vegetables)
-- fruit (all fruits)
-- dairy (milk, cheese, yogurt, butter)
-- grain (rice, bread, noodles, pasta, cereal)
-- condiment (sauces, spices, oil, salt, pepper)
-- beverage (drinks, juice, soda)
-- other (anything else)
+QUANTITY COUNTING:
+- For COUNTABLE items (eggs, apples, bottles, cans, etc.): COUNT and return the actual number you see
+- For UNCOUNTABLE items (milk, rice, meat, etc.): return quantity as 1
+- If you can clearly see multiple of the same item, count them (e.g., 6 eggs, 3 apples)
+- If quantity is unclear or partially hidden, make your best estimate
+- User can always correct the quantity, so it's okay to guess
+
+VALID CATEGORIES (use exactly these):
+- protein (meat, eggs, tofu, tempeh, fish, chicken, beef, seafood)
+- vegetable (all vegetables, leafy greens, root vegetables)
+- fruit (all fresh fruits)
+- dairy (milk, cheese, yogurt, butter, cream)
+- grain (rice, bread, noodles, pasta, cereal, flour)
+- condiment (sauces, spices, oil, salt, pepper, herbs)
+- beverage (drinks, juice, soda, water, tea, coffee)
+- other (other legitimate food items only)
 
 CONFIDENCE LEVELS:
-- "high" = 90%+ sure
+- "high" = 90%+ sure this is a valid food item
 - "medium" = 70-90% sure (user will confirm)
 - "low" = below 70% (skip these items)
 
 OUTPUT FORMAT - Return ONLY valid JSON, no explanation:
 {
   "items": [
-    {"name": "eggs", "category": "protein", "confidence": "high"},
-    {"name": "milk", "category": "dairy", "confidence": "high"},
-    {"name": "green vegetable", "category": "vegetable", "confidence": "medium"}
+    {"name": "eggs", "category": "protein", "quantity": 6, "confidence": "high"},
+    {"name": "milk", "category": "dairy", "quantity": 1, "confidence": "high"},
+    {"name": "apple", "category": "fruit", "quantity": 3, "confidence": "medium"}
   ]
 }
 
 If confidence is "medium", the app will ask user to confirm/correct.
-If no food detected, return: {"items": []}
+If no valid food detected OR image contains non-food/dangerous items, return: {"items": []}
 ''';
 
       // Send to Gemini
@@ -166,6 +184,8 @@ If no food detected, return: {"items": []}
         final rawName = item['name'] as String? ?? 'unknown item';
         final categoryStr = item['category'] as String? ?? 'other';
         final confidenceStr = item['confidence'] as String? ?? 'low';
+        // Get quantity from Gemini, default to 1 if not provided
+        final quantity = (item['quantity'] as num?)?.toDouble() ?? 1.0;
 
         // Convert string confidence to numeric (for UI display)
         final confidenceValue = _parseConfidence(confidenceStr);
@@ -183,7 +203,7 @@ If no food detected, return: {"items": []}
           id: const Uuid().v4(),
           name: name,
           category: _parseCategory(categoryStr),
-          quantity: 1, // ALWAYS DEFAULT TO 1 - user will adjust
+          quantity: quantity, // Use Gemini's count, user can adjust if wrong
           unit: _getDefaultUnit(categoryStr), // Default unit based on category
           expiryDate: null, // Will be set based on category defaults or user input
           confidence: confidenceValue,
@@ -300,7 +320,7 @@ If no food detected, return: {"items": []}
 
       // Build inventory list string
       final inventoryList = inventory
-          .map((i) => "${i.name} (${i.quantity} ${i.unit}, exp: ${i.daysUntilExpiry} hari)")
+          .map((i) => "${i.name} (${i.quantity} ${i.unit}, exp: ${i.daysUntilExpiry} days)")
           .join(", ");
 
       // Get expiring items (within 3 days)
@@ -311,7 +331,7 @@ If no food detected, return: {"items": []}
 
       final expiringList = expiringItems.isNotEmpty
           ? expiringItems.join(", ")
-          : "Tidak ada yang segera expired";
+          : "None expiring soon";
 
       debugPrint('[GeminiService] Expiring items: $expiringList');
 
@@ -344,50 +364,53 @@ If no food detected, return: {"items": []}
   /// Build recipe generation prompt
   String _buildRecipePrompt(String inventoryList, String expiringList) {
     return '''
-Kamu adalah chef Indonesia yang membantu mahasiswa kos memasak dengan bahan yang ada.
+You are a helpful home chef assistant. Suggest easy recipes using available ingredients.
 
-BAHAN DI KULKAS:
+INGREDIENTS IN FRIDGE:
 $inventoryList
 
-PRIORITAS (HARUS SEGERA DIPAKAI):
+PRIORITY (USE THESE FIRST - expiring soon):
 $expiringList
 
-Berikan 3 resep yang:
-1. Menggunakan bahan yang ada (terutama yang expiring)
-2. Mudah dibuat (max 30 menit, peralatan sederhana)
-3. Cocok untuk 1-2 porsi (anak kos)
-4. Resep Indonesia atau fusion yang familiar
+Generate 3 recipes that:
+1. Use available ingredients (prioritize expiring items)
+2. Are easy to make (max 30 minutes, simple equipment)
+3. Serve 1-2 portions (suitable for students/individuals)
+4. Can be Asian, Western, or fusion - whatever works best with ingredients
 
-FORMAT JSON (HANYA JSON, tanpa penjelasan):
+IMPORTANT: ALL output must be in ENGLISH - recipe names, descriptions, ingredients, instructions, everything.
+
+OUTPUT FORMAT - Return ONLY valid JSON, no explanation:
 {
   "recipes": [
     {
-      "name": "Nama Resep",
-      "description": "Deskripsi singkat dalam 1 kalimat",
+      "name": "Recipe Name in English",
+      "description": "Brief one-sentence description in English",
       "cookTime": 15,
       "difficulty": "easy",
       "servings": 2,
-      "usesExpiringItems": ["tomat", "tahu"],
+      "usesExpiringItems": ["tomato", "tofu"],
       "ingredients": [
-        {"name": "tomat", "quantity": "2 buah"},
-        {"name": "tahu", "quantity": "1 kotak"},
-        {"name": "garam", "quantity": "secukupnya"}
+        {"name": "tomato", "quantity": "2 pcs"},
+        {"name": "tofu", "quantity": "1 block"},
+        {"name": "salt", "quantity": "to taste"}
       ],
       "instructions": [
-        {"stepNumber": 1, "title": "Siapkan Bahan", "description": "Potong tahu dan tomat menjadi dadu kecil"},
-        {"stepNumber": 2, "title": "Tumis", "description": "Panaskan minyak, tumis bawang hingga harum"},
-        {"stepNumber": 3, "title": "Masak", "description": "Masukkan tahu dan tomat, aduk rata, tambahkan garam"}
+        {"stepNumber": 1, "title": "Prep Ingredients", "description": "Cut tofu and tomatoes into small cubes"},
+        {"stepNumber": 2, "title": "Saute", "description": "Heat oil in pan, saute garlic until fragrant"},
+        {"stepNumber": 3, "title": "Cook", "description": "Add tofu and tomatoes, stir well, season with salt"}
       ],
-      "proTip": "Tips memasak singkat (opsional)"
+      "proTip": "Brief cooking tip (optional)"
     }
   ]
 }
 
 RULES:
+- ALL text must be in English
 - difficulty: "easy" (< 15 min), "medium" (15-25 min), "hard" (> 25 min)
-- usesExpiringItems hanya diisi dengan bahan dari daftar PRIORITAS
-- ingredients harus realistis untuk mahasiswa kos
-- instructions maksimal 5 langkah, jelas dan singkat
+- usesExpiringItems: only include items from PRIORITY list
+- ingredients: use practical quantities (pcs, cups, tbsp, etc.)
+- instructions: maximum 5 steps, clear and concise
 ''';
   }
 
