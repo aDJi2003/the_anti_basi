@@ -1,39 +1,5 @@
-name: The Anti Basi
-description:
-  "The Anti Basi adalah aplikasi manajemen kulkas pintar berbasis Flutter yang bertujuan mengurangi limbah makanan (food
-  waste), khususnya bagi mahasiswa dan profesional muda. Aplikasi ini memanfaatkan Google Gemini AI untuk memindai bahan
-  makanan dan merekomendasikan resep.
-
-  🛠 Tech Stack Utama
-  * Frontend: Flutter 3.x (Dart)
-  * State Management: Riverpod (flutter_riverpod)
-  * Navigasi: Go Router (go_router)
-  * Backend: Firebase (Auth, Firestore, Storage, Cloud Messaging)
-  * AI: Google Gemini 2.5 Flash Lite (via google_generative_ai)
-  * Vision: Untuk deteksi bahan makanan dari foto.
-  * Generative Text: Untuk membuat resep berdasarkan bahan yang tersedia.
-
-  ✅ Fitur yang Sudah Terimplementasi
-  Berdasarkan file ref/implemented.md dan struktur kode:
-
-  1. Smart Scan (Inti):
-  * Mengambil foto/upload dari galeri.
-  * Deteksi otomatis jenis makanan dan estimasi jumlah menggunakan Gemini Vision.
-  * Konfirmasi hasil scan sebelum disimpan ke Inventory.
-  2. Manajemen Inventory:
-  * List bahan makanan dengan status kedaluwarsa (Fresh, Expiring Soon, Expired).
-  * CRUD (Create, Read, Update, Delete) item.
-  * Edit detail item (kuantitas, kategori, tanggal expired).
-  3. Rekomendasi Resep AI:
-  * Generate resep berdasarkan bahan di inventory (memprioritaskan yang mau basi).
-  * Menampilkan detail resep (bahan, instruksi).
-  * Menyimpan resep ke koleksi savedRecipes.
-  4. Notifikasi:
-  * Pengingat kedaluwarsa menggunakan Firebase Cloud Messaging (FCM) dan Local Notifications.
-  5. Autentikasi & Profil:
-  * Login/Signup dengan Email & Password atau Google Sign-In.
-  * Upload foto profil pengguna.
-  * Pengaturan preferensi (skill memasak, pantangan makanan, tema Dark/Light)."
+name: the_anti_basi
+description: "Smart fridge manager app to reduce food waste. Built with Flutter, Firebase, and Gemini AI."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev

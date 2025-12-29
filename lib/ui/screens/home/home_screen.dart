@@ -64,6 +64,7 @@ class HomeScreen extends ConsumerWidget {
                   SliverToBoxAdapter(
                     child: RecipeCtaCard(
                       expiringItems: state.expiringItems,
+                      isGenerating: recipeState.isGenerating,
                       onGenerateRecipes: recipeState.isGenerating
                           ? () {} // Disable while generating
                           : () => recipeController.generateRecipes(context),

@@ -9,10 +9,12 @@ class RecipeCtaCard extends StatelessWidget {
     super.key,
     required this.expiringItems,
     required this.onGenerateRecipes,
+    this.isGenerating = false,
   });
 
   final List<InventoryItem> expiringItems;
   final VoidCallback onGenerateRecipes;
+  final bool isGenerating;
 
   @override
   Widget build(BuildContext context) {
@@ -138,39 +140,53 @@ class RecipeCtaCard extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // CTA button
-                  Container(
+                  // CTA button with loading state
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOutCubic,
                     width: double.infinity,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isGenerating
+                          ? Colors.white.withAlpha(230)
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.restaurant_menu_rounded,
-                          color: hasUrgent ? AppColors.orange : AppColors.teal,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          hasUrgent ? 'Cook now' : 'Find recipes',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color:
+                    child: isGenerating
+                        ? _LoadingButton(
+                            accentColor:
                                 hasUrgent ? AppColors.orange : AppColors.teal,
-                            fontWeight: FontWeight.w600,
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.restaurant_menu_rounded,
+                                color: hasUrgent
+                                    ? AppColors.orange
+                                    : AppColors.teal,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                hasUrgent ? 'Cook now' : 'Find recipes',
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  color: hasUrgent
+                                      ? AppColors.orange
+                                      : AppColors.teal,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.arrow_forward_rounded,
+                                color: hasUrgent
+                                    ? AppColors.orange
+                                    : AppColors.teal,
+                                size: 16,
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.arrow_forward_rounded,
-                          color: hasUrgent ? AppColors.orange : AppColors.teal,
-                          size: 16,
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
@@ -207,5 +223,90 @@ class RecipeCtaCard extends StatelessWidget {
     } else {
       return '${item.daysUntilExpiry}d';
     }
+  }
+}
+
+/// Animated loading button with cooking text
+class _LoadingButton extends StatefulWidget {
+  const _LoadingButton({required this.accentColor});
+
+  final Color accentColor;
+
+  @override
+  State<_LoadingButton> createState() => _LoadingButtonState();
+}
+
+class _LoadingButtonState extends State<_LoadingButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _dotsAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    )..repeat();
+
+    _dotsAnimation = Tween<double>(begin: 0, end: 3).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Cooking pot icon with subtle rotation
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Transform.rotate(
+              angle: _controller.value * 0.1 - 0.05,
+              child: Icon(
+                Icons.soup_kitchen_rounded,
+                color: widget.accentColor,
+                size: 18,
+              ),
+            );
+          },
+        ),
+        const SizedBox(width: 8),
+        // "Cooking" text with animated dots
+        AnimatedBuilder(
+          animation: _dotsAnimation,
+          builder: (context, child) {
+            final dots = '.' * _dotsAnimation.value.floor();
+            return Text(
+              'Cooking$dots',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: widget.accentColor,
+                fontWeight: FontWeight.w600,
+              ),
+            );
+          },
+        ),
+        // Small loading indicator
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 14,
+          height: 14,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(widget.accentColor),
+          ),
+        ),
+      ],
+    );
   }
 }
