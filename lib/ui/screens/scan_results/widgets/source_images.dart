@@ -3,11 +3,7 @@ import '../../../../config/app_colors.dart';
 
 /// Horizontal scrollable source images
 class SourceImages extends StatelessWidget {
-  const SourceImages({
-    super.key,
-    this.images = const [],
-    this.onAddImage,
-  });
+  const SourceImages({super.key, this.images = const [], this.onAddImage});
 
   final List<String> images;
   final VoidCallback? onAddImage;
@@ -27,7 +23,9 @@ class SourceImages extends StatelessWidget {
             'SOURCE IMAGE',
             style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textSecondary,
               letterSpacing: 1.0,
             ),
           ),
@@ -60,10 +58,7 @@ class SourceImages extends StatelessWidget {
 
 /// Single image thumbnail
 class _ImageThumbnail extends StatelessWidget {
-  const _ImageThumbnail({
-    required this.imagePath,
-    this.isMain = false,
-  });
+  const _ImageThumbnail({required this.imagePath, this.isMain = false});
 
   final String imagePath;
   final bool isMain;
@@ -78,7 +73,9 @@ class _ImageThumbnail extends StatelessWidget {
       height: 128,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.gray200),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.gray200,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha(13),
@@ -105,9 +102,7 @@ class _ImageThumbnail extends StatelessWidget {
           ),
 
           // Overlay
-          Container(
-            color: Colors.black.withAlpha(51),
-          ),
+          Container(color: Colors.black.withAlpha(51)),
 
           // Main badge
           if (isMain)
@@ -115,10 +110,7 @@ class _ImageThumbnail extends StatelessWidget {
               bottom: 4,
               right: 4,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.black.withAlpha(153),
                   borderRadius: BorderRadius.circular(4),

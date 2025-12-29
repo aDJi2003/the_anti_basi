@@ -19,6 +19,8 @@ class ScanResultsScreen extends ConsumerStatefulWidget {
 }
 
 class _ScanResultsScreenState extends ConsumerState<ScanResultsScreen> {
+  final _moreButtonKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -66,9 +68,8 @@ class _ScanResultsScreenState extends ConsumerState<ScanResultsScreen> {
             // Header
             ResultsHeader(
               onBack: () => controller.goBack(context),
-              onMore: () {
-                // TODO: Show more options
-              },
+              onMore: () => controller.showMoreOptions(context, _moreButtonKey),
+              moreButtonKey: _moreButtonKey,
             ),
 
             // Content
@@ -76,11 +77,14 @@ class _ScanResultsScreenState extends ConsumerState<ScanResultsScreen> {
               child: state.isLoading
                   ? const _LoadingState()
                   : state.items.isEmpty
-                      ? const _EmptyState()
-                      : _ResultsContent(
-                          state: state,
-                          controller: controller,
-                        ),
+                  ? _EmptyState(
+                      onAddManually: () => controller.addManualItem(context),
+                    )
+                  : _ResultsContent(
+                      state: state,
+                      controller: controller,
+                      context: context,
+                    ),
             ),
 
             // Bottom bar
@@ -105,16 +109,11 @@ class _LoadingState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
-            color: AppColors.primary,
-          ),
+          CircularProgressIndicator(color: AppColors.primary),
           SizedBox(height: 16),
           Text(
             'Analyzing items...',
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
           ),
         ],
       ),
@@ -124,7 +123,9 @@ class _LoadingState extends StatelessWidget {
 
 /// Empty state when no items detected
 class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+  const _EmptyState({required this.onAddManually});
+
+  final VoidCallback onAddManually;
 
   @override
   Widget build(BuildContext context) {
@@ -155,16 +156,38 @@ class _EmptyState extends StatelessWidget {
               'No Items Detected',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Try taking another photo or add items manually',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            // Add manual item button
+            FilledButton.icon(
+              onPressed: onAddManually,
+              icon: const Icon(Icons.add_rounded, size: 20),
+              label: const Text('Add Item Manually'),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
           ],
         ),
@@ -178,13 +201,15 @@ class _ResultsContent extends StatelessWidget {
   const _ResultsContent({
     required this.state,
     required this.controller,
+    required this.context,
   });
 
   final ScanResultsState state;
   final ScanResultsController controller;
+  final BuildContext context;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext _) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -197,7 +222,7 @@ class _ResultsContent extends StatelessWidget {
             child: SourceImages(
               images: state.sourceImages,
               onAddImage: () {
-                // TODO: Add more images
+                controller.showAddMoreImagesComingSoon(context);
               },
             ),
           ),
@@ -214,14 +239,18 @@ class _ResultsContent extends StatelessWidget {
                   'DETECTED ITEMS',
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                     letterSpacing: 1.0,
                   ),
                 ),
                 Text(
                   '${state.selectedCount}/${state.items.length} selected',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                    color: isDark
+                        ? AppColors.darkTextMuted
+                        : AppColors.textMuted,
                   ),
                 ),
               ],
@@ -231,34 +260,30 @@ class _ResultsContent extends StatelessWidget {
 
         // Items list
         SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final item = state.items[index];
-              return Column(
-                children: [
-                  ScannedItemTile(
-                    item: item,
-                    onToggle: () => controller.toggleItem(item.id),
-                    onQuantityChanged: (qty) =>
-                        controller.updateQuantity(item.id, qty),
-                    onUnitChanged: (unit) =>
-                        controller.updateUnit(item.id, unit),
-                    onDateTap: () =>
-                        controller.updateExpiryDate(context, item.id),
-                    onDelete: () => controller.deleteItem(item.id),
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final item = state.items[index];
+            return Column(
+              children: [
+                ScannedItemTile(
+                  item: item,
+                  onToggle: () => controller.toggleItem(item.id),
+                  onQuantityChanged: (qty) =>
+                      controller.updateQuantity(item.id, qty),
+                  onUnitChanged: (unit) => controller.updateUnit(item.id, unit),
+                  onDateTap: () =>
+                      controller.updateExpiryDate(context, item.id),
+                  onDelete: () => controller.deleteItem(item.id),
+                ),
+                if (index < state.items.length - 1)
+                  Divider(
+                    height: 1,
+                    indent: 20,
+                    endIndent: 20,
+                    color: isDark ? AppColors.darkDivider : AppColors.gray100,
                   ),
-                  if (index < state.items.length - 1)
-                    Divider(
-                      height: 1,
-                      indent: 20,
-                      endIndent: 20,
-                      color: isDark ? AppColors.darkDivider : AppColors.gray100,
-                    ),
-                ],
-              );
-            },
-            childCount: state.items.length,
-          ),
+              ],
+            );
+          }, childCount: state.items.length),
         ),
 
         // Add manual item button
@@ -272,9 +297,7 @@ class _ResultsContent extends StatelessWidget {
         ),
 
         // Bottom padding for safe area
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 100),
-        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 100)),
       ],
     );
   }

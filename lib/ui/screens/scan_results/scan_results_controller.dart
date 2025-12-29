@@ -56,13 +56,17 @@ class ScanResultsController extends Notifier<ScanResultsState> {
     if (_isInitialized) return;
     _isInitialized = true;
 
-    debugPrint('[ScanResultsController] Initializing with ${items.length} items');
+    debugPrint(
+      '[ScanResultsController] Initializing with ${items.length} items',
+    );
 
     // Set default expiry dates based on category if not set
     final processedItems = items.map((item) {
       if (item.expiryDate == null) {
         return item.copyWith(
-          expiryDate: DateTime.now().add(Duration(days: _getDefaultExpiryDays(item.category))),
+          expiryDate: DateTime.now().add(
+            Duration(days: _getDefaultExpiryDays(item.category)),
+          ),
         );
       }
       return item;
@@ -82,10 +86,7 @@ class ScanResultsController extends Notifier<ScanResultsState> {
 
     debugPrint('[ScanResultsController] Initializing for manual entry');
 
-    state = state.copyWith(
-      isLoading: false,
-      items: [],
-    );
+    state = state.copyWith(isLoading: false, items: []);
   }
 
   /// Get default expiry days based on category
@@ -149,7 +150,8 @@ class ScanResultsController extends Notifier<ScanResultsState> {
   /// Update item expiry date
   Future<void> updateExpiryDate(BuildContext context, String itemId) async {
     final item = state.items.firstWhere((i) => i.id == itemId);
-    final initialDate = item.expiryDate ?? DateTime.now().add(const Duration(days: 7));
+    final initialDate =
+        item.expiryDate ?? DateTime.now().add(const Duration(days: 7));
 
     final picked = await showDatePicker(
       context: context,
@@ -159,9 +161,9 @@ class ScanResultsController extends Notifier<ScanResultsState> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: const Color(0xFF10B981),
-                ),
+            colorScheme: Theme.of(
+              context,
+            ).colorScheme.copyWith(primary: const Color(0xFF10B981)),
           ),
           child: child!,
         );
@@ -226,7 +228,10 @@ class ScanResultsController extends Notifier<ScanResultsState> {
       await _repository.addItems(inventoryItems);
 
       if (context.mounted) {
-        _showSnackBar(context, '${selectedItems.length} items added to inventory');
+        _showSnackBar(
+          context,
+          '${selectedItems.length} items added to inventory',
+        );
 
         // Navigate back to inventory
         context.go(Routes.inventory);
@@ -251,15 +256,69 @@ class ScanResultsController extends Notifier<ScanResultsState> {
         content: Text(message),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
+  }
+
+  /// Show coming soon message for add more images
+  void showAddMoreImagesComingSoon(BuildContext context) {
+    _showSnackBar(
+      context,
+      'Adding more images will be available in a future update',
+    );
+  }
+
+  /// Show more options popup menu
+  void showMoreOptions(BuildContext context, GlobalKey key) {
+    final RenderBox renderBox =
+        key.currentContext!.findRenderObject() as RenderBox;
+    final Offset offset = renderBox.localToGlobal(Offset.zero);
+    final Size size = renderBox.size;
+
+    showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        offset.dx,
+        offset.dy + size.height,
+        offset.dx + size.width,
+        0,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      items: [
+        PopupMenuItem<String>(
+          value: 'add_manual',
+          child: Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withAlpha(26),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.edit_outlined,
+                  color: Color(0xFF10B981),
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text('Add Item Manually'),
+            ],
+          ),
+        ),
+      ],
+    ).then((value) {
+      if (value == 'add_manual' && context.mounted) {
+        addManualItem(context);
+      }
+    });
   }
 }
 
 /// Provider for scan results controller
 final scanResultsControllerProvider =
     NotifierProvider.autoDispose<ScanResultsController, ScanResultsState>(
-        ScanResultsController.new);
+      ScanResultsController.new,
+    );

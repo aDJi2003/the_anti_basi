@@ -22,7 +22,9 @@ class ResultsBottomBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor.withAlpha(242), // 95%
         border: Border(
-          top: BorderSide(color: isDark ? AppColors.darkDivider : AppColors.gray200),
+          top: BorderSide(
+            color: isDark ? AppColors.darkDivider : AppColors.gray200,
+          ),
         ),
       ),
       child: SafeArea(

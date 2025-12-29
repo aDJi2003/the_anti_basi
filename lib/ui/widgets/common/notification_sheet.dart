@@ -10,7 +10,10 @@ Future<void> showNotificationSheet(BuildContext context) {
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    isDismissible: true,
+    enableDrag: true,
     backgroundColor: Colors.transparent,
+    barrierColor: Colors.black54,
     builder: (context) => const NotificationSheet(),
   );
 }
@@ -24,51 +27,60 @@ class NotificationSheet extends ConsumerWidget {
     final state = ref.watch(notificationControllerProvider);
     final controller = ref.read(notificationControllerProvider.notifier);
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      minChildSize: 0.5,
-      maxChildSize: 0.95,
-      builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: context.colors.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            children: [
-              // Drag handle
-              Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 8),
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: context.colors.textMuted,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => Navigator.pop(context),
+      child: GestureDetector(
+        onTap: () {}, // Prevent tap from propagating to outer GestureDetector
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: context.colors.surface,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
                 ),
               ),
+              child: Column(
+                children: [
+                  // Drag handle
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12, bottom: 8),
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: context.colors.textMuted,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
 
-              // Header
-              _NotificationHeader(
-                unreadCount: state.unreadCount,
-                onMarkAllRead: state.hasUnread ? controller.markAllAsRead : null,
-                onClearAll: state.notifications.isNotEmpty
-                    ? () => _showClearDialog(context, controller)
-                    : null,
-              ),
+                  // Header
+                  _NotificationHeader(
+                    unreadCount: state.unreadCount,
+                    onMarkAllRead: state.hasUnread
+                        ? controller.markAllAsRead
+                        : null,
+                    onClearAll: state.notifications.isNotEmpty
+                        ? () => _showClearDialog(context, controller)
+                        : null,
+                  ),
 
-              Divider(height: 1, color: context.colors.divider),
+                  Divider(height: 1, color: context.colors.divider),
 
-              // Content
-              Expanded(
-                child: state.isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(
-                          color: context.colors.primary,
-                        ),
-                      )
-                    : state.notifications.isEmpty
+                  // Content
+                  Expanded(
+                    child: state.isLoading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: context.colors.primary,
+                            ),
+                          )
+                        : state.notifications.isEmpty
                         ? const _EmptyState()
                         : ListView.separated(
                             controller: scrollController,
@@ -92,20 +104,26 @@ class NotificationSheet extends ConsumerWidget {
                                     // Navigate to action route
                                   }
                                 },
-                                onDelete: () =>
-                                    controller.deleteNotification(notification.id),
+                                onDelete: () => controller.deleteNotification(
+                                  notification.id,
+                                ),
                               );
                             },
                           ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        );
-      },
+            );
+          },
+        ),
+      ),
     );
   }
 
-  void _showClearDialog(BuildContext context, NotificationController controller) {
+  void _showClearDialog(
+    BuildContext context,
+    NotificationController controller,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -128,9 +146,7 @@ class NotificationSheet extends ConsumerWidget {
               controller.clearAll();
               Navigator.pop(context);
             },
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.error,
-            ),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Clear All'),
           ),
         ],
@@ -255,10 +271,7 @@ class _NotificationTile extends StatelessWidget {
         color: AppColors.error,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
-        child: const Icon(
-          Icons.delete_outline,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.delete_outline, color: Colors.white),
       ),
       child: InkWell(
         onTap: onTap,

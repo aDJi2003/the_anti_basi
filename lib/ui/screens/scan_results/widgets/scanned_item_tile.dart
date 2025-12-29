@@ -97,7 +97,9 @@ class ScannedItemTile extends StatelessWidget {
                           item.name,
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.textPrimary,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -106,7 +108,9 @@ class ScannedItemTile extends StatelessWidget {
                         onTap: onDelete,
                         child: Icon(
                           Icons.close_rounded,
-                          color: isDark ? AppColors.darkTextMuted : AppColors.gray400,
+                          color: isDark
+                              ? AppColors.darkTextMuted
+                              : AppColors.gray400,
                           size: 20,
                         ),
                       ),
@@ -148,7 +152,9 @@ class ScannedItemTile extends StatelessWidget {
                       child: Text(
                         'Could not detect details',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+                          color: isDark
+                              ? AppColors.darkTextMuted
+                              : AppColors.textMuted,
                           fontStyle: FontStyle.italic,
                         ),
                       ),
@@ -165,10 +171,7 @@ class ScannedItemTile extends StatelessWidget {
 
 /// Quantity input field
 class _QuantityInput extends StatelessWidget {
-  const _QuantityInput({
-    required this.value,
-    required this.onChanged,
-  });
+  const _QuantityInput({required this.value, required this.onChanged});
 
   final double value;
   final ValueChanged<double> onChanged;
@@ -184,7 +187,9 @@ class _QuantityInput extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurfaceLight : AppColors.gray50,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.gray200),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.gray200,
+        ),
       ),
       child: TextField(
         controller: TextEditingController(
@@ -229,10 +234,7 @@ const List<String> _availableUnits = [
 
 /// Unit selector dropdown
 class _UnitSelector extends StatelessWidget {
-  const _UnitSelector({
-    required this.value,
-    required this.onChanged,
-  });
+  const _UnitSelector({required this.value, required this.onChanged});
 
   final String value;
   final ValueChanged<String> onChanged;
@@ -248,7 +250,9 @@ class _UnitSelector extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurfaceLight : AppColors.gray50,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.gray200),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.gray200,
+        ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -262,14 +266,13 @@ class _UnitSelector extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
           ),
           dropdownColor: theme.cardColor,
           items: _availableUnits.map((unit) {
-            return DropdownMenuItem<String>(
-              value: unit,
-              child: Text(unit),
-            );
+            return DropdownMenuItem<String>(value: unit, child: Text(unit));
           }).toList(),
           onChanged: (newValue) {
             if (newValue != null) onChanged(newValue);
@@ -306,8 +309,8 @@ class _DateInput extends StatelessWidget {
     final iconColor = isExpiringSoon
         ? AppColors.error
         : date != null
-            ? AppColors.warning
-            : (isDark ? AppColors.darkTextMuted : AppColors.textMuted);
+        ? AppColors.warning
+        : (isDark ? AppColors.darkTextMuted : AppColors.textMuted);
     final textColor = isExpiringSoon
         ? AppColors.error
         : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary);

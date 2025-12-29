@@ -7,16 +7,20 @@ class ResultsHeader extends StatelessWidget {
     super.key,
     required this.onBack,
     this.onMore,
+    this.moreButtonKey,
   });
 
   final VoidCallback onBack;
   final VoidCallback? onMore;
+  final GlobalKey? moreButtonKey;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.textPrimary;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -25,10 +29,7 @@ class ResultsHeader extends StatelessWidget {
           // Back button
           IconButton(
             onPressed: onBack,
-            icon: Icon(
-              Icons.arrow_back_rounded,
-              color: textColor,
-            ),
+            icon: Icon(Icons.arrow_back_rounded, color: textColor),
           ),
 
           // Title
@@ -45,11 +46,9 @@ class ResultsHeader extends StatelessWidget {
 
           // More button
           IconButton(
+            key: moreButtonKey,
             onPressed: onMore,
-            icon: Icon(
-              Icons.more_horiz_rounded,
-              color: textColor,
-            ),
+            icon: Icon(Icons.more_horiz_rounded, color: textColor),
           ),
         ],
       ),

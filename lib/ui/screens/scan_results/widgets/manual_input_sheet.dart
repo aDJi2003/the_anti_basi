@@ -63,7 +63,9 @@ class _ManualInputSheetState extends State<ManualInputSheet> {
                 'Add Item Manually',
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 24),
@@ -76,14 +78,26 @@ class _ManualInputSheetState extends State<ManualInputSheet> {
                   style: theme.textTheme.bodyMedium,
                   decoration: InputDecoration(
                     hintText: 'e.g., Milk, Eggs, Spinach',
-                    hintStyle: TextStyle(color: isDark ? AppColors.darkTextMuted : AppColors.textMuted),
+                    hintStyle: TextStyle(
+                      color: isDark
+                          ? AppColors.darkTextMuted
+                          : AppColors.textMuted,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.gray200),
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : AppColors.gray200,
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.gray200),
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : AppColors.gray200,
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -103,7 +117,9 @@ class _ManualInputSheetState extends State<ManualInputSheet> {
                 label: 'Category',
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.gray200),
+                    border: Border.all(
+                      color: isDark ? AppColors.darkBorder : AppColors.gray200,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: DropdownButtonHideUnderline(
@@ -146,18 +162,25 @@ class _ManualInputSheetState extends State<ManualInputSheet> {
                           hintText: '1',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide:
-                                BorderSide(color: isDark ? AppColors.darkBorder : AppColors.gray200),
+                            borderSide: BorderSide(
+                              color: isDark
+                                  ? AppColors.darkBorder
+                                  : AppColors.gray200,
+                            ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide:
-                                BorderSide(color: isDark ? AppColors.darkBorder : AppColors.gray200),
+                            borderSide: BorderSide(
+                              color: isDark
+                                  ? AppColors.darkBorder
+                                  : AppColors.gray200,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide:
-                                const BorderSide(color: AppColors.primary),
+                            borderSide: const BorderSide(
+                              color: AppColors.primary,
+                            ),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -182,7 +205,11 @@ class _ManualInputSheetState extends State<ManualInputSheet> {
                             vertical: 14,
                           ),
                           decoration: BoxDecoration(
-                            border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.gray200),
+                            border: Border.all(
+                              color: isDark
+                                  ? AppColors.darkBorder
+                                  : AppColors.gray200,
+                            ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -230,9 +257,9 @@ class _ManualInputSheetState extends State<ManualInputSheet> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: AppColors.primary,
-                ),
+            colorScheme: Theme.of(
+              context,
+            ).colorScheme.copyWith(primary: AppColors.primary),
           ),
           child: child!,
         );
@@ -247,9 +274,9 @@ class _ManualInputSheetState extends State<ManualInputSheet> {
   void _submit() {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter item name')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please enter item name')));
       return;
     }
 
@@ -291,10 +318,7 @@ class _ManualInputSheetState extends State<ManualInputSheet> {
 
 /// Input field with label
 class _InputField extends StatelessWidget {
-  const _InputField({
-    required this.label,
-    required this.child,
-  });
+  const _InputField({required this.label, required this.child});
 
   final String label;
   final Widget child;
@@ -311,7 +335,9 @@ class _InputField extends StatelessWidget {
           label,
           style: theme.textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w500,
-            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
           ),
         ),
         const SizedBox(height: 8),
