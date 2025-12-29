@@ -323,6 +323,9 @@ If no valid food detected OR image contains non-food/dangerous items, return: {"
           .map((i) => "${i.name} (${i.quantity} ${i.unit}, exp: ${i.daysUntilExpiry} days)")
           .join(", ");
 
+      // Get all inventory names for exact matching
+      final inventoryNames = inventory.map((i) => i.name).toList();
+
       // Get expiring items (within 3 days)
       final expiringItems = inventory
           .where((i) => i.daysUntilExpiry <= 3 && i.daysUntilExpiry >= 0)
@@ -334,9 +337,10 @@ If no valid food detected OR image contains non-food/dangerous items, return: {"
           : "None expiring soon";
 
       debugPrint('[GeminiService] Expiring items: $expiringList');
+      debugPrint('[GeminiService] Inventory names for matching: $inventoryNames');
 
       // Build prompt
-      final prompt = _buildRecipePrompt(inventoryList, expiringList);
+      final prompt = _buildRecipePrompt(inventoryList, expiringList, inventoryNames);
 
       // Send to Gemini
       final content = [Content.text(prompt)];
@@ -362,12 +366,17 @@ If no valid food detected OR image contains non-food/dangerous items, return: {"
   }
 
   /// Build recipe generation prompt
-  String _buildRecipePrompt(String inventoryList, String expiringList) {
+  String _buildRecipePrompt(String inventoryList, String expiringList, List<String> inventoryNames) {
+    final validNamesStr = inventoryNames.join(', ');
+
     return '''
 You are a helpful home chef assistant. Suggest easy recipes using available ingredients.
 
 INGREDIENTS IN FRIDGE:
 $inventoryList
+
+VALID INGREDIENT NAMES (use EXACTLY these names):
+$validNamesStr
 
 PRIORITY (USE THESE FIRST - expiring soon):
 $expiringList
@@ -377,6 +386,15 @@ Generate 3 recipes that:
 2. Are easy to make (max 30 minutes, simple equipment)
 3. Serve 1-2 portions (suitable for students/individuals)
 4. Can be Asian, Western, or fusion - whatever works best with ingredients
+
+CRITICAL - INGREDIENT NAME MATCHING:
+- You MUST use the EXACT ingredient names from "VALID INGREDIENT NAMES" list above
+- DO NOT translate, rephrase, or modify ingredient names in any way
+- Example: If inventory has "Carrot", use "Carrot" - NOT "Wortel", "carrots", "carrot", or "Carrots"
+- Example: If inventory has "Eggs", use "Eggs" - NOT "Telur", "egg", or "Egg"
+- The ingredient name in your output MUST be character-for-character identical to the inventory name
+- For ingredients NOT in the fridge (like salt, oil, water), you may use any reasonable English name
+- This is critical for the app to match recipe ingredients with inventory items
 
 IMPORTANT: ALL output must be in ENGLISH - recipe names, descriptions, ingredients, instructions, everything.
 
@@ -389,11 +407,11 @@ OUTPUT FORMAT - Return ONLY valid JSON, no explanation:
       "cookTime": 15,
       "difficulty": "easy",
       "servings": 2,
-      "usesExpiringItems": ["tomato", "tofu"],
+      "usesExpiringItems": ["Tomato", "Tofu"],
       "ingredients": [
-        {"name": "tomato", "quantity": "2 pcs"},
-        {"name": "tofu", "quantity": "1 block"},
-        {"name": "salt", "quantity": "to taste"}
+        {"name": "Tomato", "quantity": "2 pcs", "fromInventory": true},
+        {"name": "Tofu", "quantity": "1 block", "fromInventory": true},
+        {"name": "salt", "quantity": "to taste", "fromInventory": false}
       ],
       "instructions": [
         {"stepNumber": 1, "title": "Prep Ingredients", "description": "Cut tofu and tomatoes into small cubes"},
@@ -407,8 +425,10 @@ OUTPUT FORMAT - Return ONLY valid JSON, no explanation:
 
 RULES:
 - ALL text must be in English
+- For ingredients from inventory: use EXACT name from VALID INGREDIENT NAMES list, set fromInventory: true
+- For ingredients NOT from inventory (common pantry items): use English name, set fromInventory: false
+- usesExpiringItems: only include items from PRIORITY list (use EXACT names)
 - difficulty: "easy" (< 15 min), "medium" (15-25 min), "hard" (> 25 min)
-- usesExpiringItems: only include items from PRIORITY list
 - ingredients: use practical quantities (pcs, cups, tbsp, etc.)
 - instructions: maximum 5 steps, clear and concise
 ''';

@@ -45,10 +45,12 @@ class RecipeIngredient {
   const RecipeIngredient({
     required this.name,
     required this.quantity,
+    this.fromInventory = false,
   });
 
   final String name;
   final String quantity;
+  final bool fromInventory; // true if ingredient comes from user's inventory
 
   // ============ FIRESTORE SERIALIZATION ============
 
@@ -56,6 +58,7 @@ class RecipeIngredient {
     return RecipeIngredient(
       name: map['name'] as String? ?? '',
       quantity: map['quantity'] as String? ?? '',
+      fromInventory: map['fromInventory'] as bool? ?? false,
     );
   }
 
@@ -63,16 +66,19 @@ class RecipeIngredient {
     return {
       'name': name,
       'quantity': quantity,
+      'fromInventory': fromInventory,
     };
   }
 
   RecipeIngredient copyWith({
     String? name,
     String? quantity,
+    bool? fromInventory,
   }) {
     return RecipeIngredient(
       name: name ?? this.name,
       quantity: quantity ?? this.quantity,
+      fromInventory: fromInventory ?? this.fromInventory,
     );
   }
 }
