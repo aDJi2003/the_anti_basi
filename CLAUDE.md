@@ -12,6 +12,37 @@ Core features:
 - Get recipe suggestions based on expiring items
 - Push notifications for expiring food
 
+## Current Status
+
+### Completed Features
+- **Auth**: Email/password, Google Sign-In, SignUp with profile photo (max 2MB, 512x512)
+- **Home**: Time-based greeting, expiring items dashboard, reactive updates via stream
+- **Inventory**: List with filters, item detail screen with inline editing (quantity, category, expiry)
+- **Scan**: Camera preview, capture, gallery picker, flash toggle
+- **Scan Results**: AI detection display, manual item entry, editable items before save
+- **Recipe**: Generate from expiring items, preview & save, ingredient matching with inventory
+- **Profile**: User data from Firestore, settings
+- **Notifications**: FCM + Local Notifications, notification center
+- **Dark Mode**: Full support with inverted neutral colors
+
+### Planned Features (Not Yet Implemented)
+1. **isFrozen field** - Add frozen toggle to InventoryItem model
+2. **Chef Level-Up System** - Gamification with XP, levels, streaks
+3. **Add More Images** - Batch image scanning (currently shows "coming soon")
+4. **Full E2E Testing**
+
+## Key Technical Decisions
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Gemini Integration | Direct API | Simpler for hackathon vs Cloud Functions |
+| Confidence System | high/medium/low | high auto-selected, medium user confirms, low skipped |
+| Recipe Ingredient Match | Exact name | Prevents translation mismatch (Carrot vs Wortel) |
+| Expiry Calculation | Centralized `date_utils.dart` | Single source of truth |
+| Recipe Flow | Generate → Preview → Save | No intermediate generatedRecipes collection |
+| Home Reactivity | `inventoryStreamProvider` | Real-time updates, no manual refresh |
+| Generated Recipe Preview | Bottom sheet | Avoids ShellRoute navigation conflict |
+
 ## Build & Development Commands
 
 ```bash
@@ -57,35 +88,38 @@ lib/
 ├── main.dart                    # App entry point (loads dotenv, Firebase)
 ├── config/
 │   ├── routes.dart              # GoRouter configuration with ShellRoute
-│   ├── theme.dart               # Material 3 theme
+│   ├── theme.dart               # Material 3 theme (light + dark)
 │   └── app_colors.dart          # Color constants
 ├── core/
-│   └── constants.dart           # App-wide constants
+│   ├── constants.dart           # App-wide constants
+│   └── date_utils.dart          # Centralized expiry calculations
 ├── data/
 │   ├── models/
 │   │   ├── inventory_item.dart  # Inventory item with Firestore serialization
 │   │   ├── scanned_item.dart    # Scanned item from Gemini
 │   │   ├── user_profile.dart    # User profile with preferences
-│   │   ├── recipe.dart          # Recipe model
+│   │   ├── recipe.dart          # Recipe model with RecipeIngredient
 │   │   └── app_notification.dart
 │   ├── repositories/
 │   │   ├── inventory_repository.dart  # Firestore CRUD for inventory
 │   │   └── user_repository.dart       # Firestore CRUD for user profile
 │   └── services/
-│       ├── camera_service.dart   # Camera operations (capture, gallery)
-│       └── gemini_service.dart   # Gemini AI for food detection
+│       ├── camera_service.dart          # Camera operations
+│       ├── gemini_service.dart          # Gemini AI (food detection + recipe)
+│       └── local_notification_service.dart  # FCM + Local notifications
 └── ui/
-    ├── widgets/common/           # Shared widgets (buttons, text fields, nav)
+    ├── widgets/common/           # Shared widgets
     └── screens/
-        ├── splash/               # Splash screen + auth check
-        ├── auth/                 # Login screen with email/password & Google
+        ├── splash/               # Splash + auth check
+        ├── auth/                 # Login + SignUp
         ├── main/                 # MainShell with bottom nav
-        ├── home/                 # Dashboard with expiring items
+        ├── home/                 # Dashboard (reactive via stream)
         ├── inventory/            # Inventory list with filters
+        ├── item_detail/          # Item detail + edit sheets
         ├── scan/                 # Camera scanner
-        ├── scan_results/         # Review scanned items before saving
-        ├── recipe/               # Recipe suggestions
-        ├── profile/              # User profile & settings
+        ├── scan_results/         # Review + manual entry
+        ├── recipe/               # Recipe generation + saved recipes
+        ├── profile/              # User profile
         └── notification/         # Notification center
 ```
 
@@ -135,6 +169,9 @@ users/{uid}/
 ├── email: string
 ├── photoURL: string?
 ├── createdAt: timestamp
+├── fcmToken: string          # Push notification token
+├── lastTokenUpdate: timestamp
+├── platform: string          # 'android' | 'ios'
 └── preferences: {
       cookingSkill: "beginner" | "intermediate" | "advanced"
       dietaryRestrictions: string[]
@@ -152,26 +189,37 @@ users/{uid}/inventory/{itemId}/
 ├── quantity: number
 ├── unit: string              # pcs, kg, g, L, mL, bottles, cans, bags, boxes, packs
 ├── expiryDate: timestamp
-└── addedAt: timestamp
+├── addedAt: timestamp
+└── isFrozen: boolean         # PLANNED - not yet implemented
+```
+
+### Saved Recipes Subcollection
+```
+users/{uid}/savedRecipes/{recipeId}/
+├── id, name, description, cookTime, difficulty, servings
+├── proTip, usesExpiringItems[], instructions[]
+├── savedAt: timestamp
+└── ingredients[]: { name, amount, unit, fromInventory: boolean }
 ```
 
 ## Key Integrations
 
-### Gemini AI (Food Detection)
+### Gemini AI
 
 Location: `lib/data/services/gemini_service.dart`
 
-- Model: `gemini-2.5-flash-lite`
-- Sends image → Returns JSON with detected food items
-- Anti-hallucination prompt (from plan.md):
-  - Only 90%+ confidence items
-  - Quantity always defaults to 1 (user adjusts)
-  - Confidence levels: "high", "medium", "low" (low items skipped)
+**Model**: `gemini-2.5-flash-lite`
 
-```dart
-// Usage
-final items = await geminiService.processImage(imagePath);
-```
+**Food Detection**:
+- Sends image → Returns JSON with detected food items
+- Confidence: high (90%+) auto-selected, medium (70-90%) user confirms, low skipped
+- Counts countable items (eggs, bottles) - user can correct
+- Safety filter rejects non-food items
+
+**Recipe Generation**:
+- Input: list of expiring ingredients from inventory
+- CRITICAL: ingredient names must match inventory exactly (prevents translation mismatch)
+- Output: JSON with recipes using those ingredients
 
 ### Camera Service
 
@@ -213,12 +261,17 @@ SplashScreen
                         ├── HomeScreen (/home)
                         ├── InventoryScreen (/inventory)
                         ├── RecipesScreen (/recipes)
+                        │   └── /:id (RecipeDetailScreen) ← nested route
                         └── ProfileScreen (/profile)
 
-Overlay screens (outside shell):
+Outside shell (full screen):
 ├── ScanScreen (/scan) → ScanResultsScreen (/scan-results)
+├── ItemDetailScreen (/inventory/item/:id)
+├── RecipePreviewScreen (/recipe-preview)
 └── SettingsScreen (/settings)
 ```
+
+**Navigation Rule**: Generated recipe previews use bottom sheet (not navigation) to avoid ShellRoute conflict.
 
 ## Key Dependencies
 
