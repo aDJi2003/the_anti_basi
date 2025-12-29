@@ -5,8 +5,8 @@ import '../../../../config/app_colors_extension.dart';
 enum InventoryFilter {
   all('All Items'),
   expiringSoon('Expiring Soon'),
-  fresh('Fresh'),
-  frozen('Frozen');
+  fresh('Fresh');
+  // frozen('Frozen'); // TODO: Add frozen category support in future
 
   const InventoryFilter(this.label);
   final String label;

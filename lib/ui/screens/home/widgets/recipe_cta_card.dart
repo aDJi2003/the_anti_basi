@@ -123,7 +123,7 @@ class RecipeCtaCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '${item.name} • ${_formatExpiry(item)}',
+                                '${item.displayName} • ${_formatExpiry(item)}',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w500,

@@ -144,14 +144,9 @@ class HomeController extends Notifier<HomeState> {
 
   /// Navigate to item detail
   void navigateToItemDetail(BuildContext context, InventoryItem item) {
-    // TODO: Implement navigation to item detail
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Viewing: ${item.name}'),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
+    context.push(
+      Routes.itemDetail.replaceFirst(':id', item.id),
+      extra: item,
     );
   }
 

@@ -52,10 +52,6 @@ class InventoryState {
       case InventoryFilter.fresh:
         items = items.where((i) => i.expiryStatus == ExpiryStatus.fresh).toList();
         break;
-      case InventoryFilter.frozen:
-        // TODO: Add frozen category support
-        items = [];
-        break;
     }
 
     return items;
@@ -165,15 +161,9 @@ class InventoryController extends Notifier<InventoryState> {
 
   /// Navigate to item detail
   void navigateToItemDetail(BuildContext context, InventoryItem item) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Viewing: ${item.displayName}'),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
+    context.push(
+      Routes.itemDetail.replaceFirst(':id', item.id),
+      extra: item,
     );
   }
 

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../data/models/inventory_item.dart';
 import '../ui/screens/auth/login_screen.dart';
 import '../ui/screens/auth/signup_screen.dart';
 import '../ui/screens/home/home_screen.dart';
 import '../ui/screens/inventory/inventory_screen.dart';
+import '../ui/screens/item_detail/item_detail_screen.dart';
 import '../ui/screens/main/main_shell.dart';
 import '../ui/screens/profile/profile_screen.dart';
 import '../ui/screens/scan/scan_screen.dart';
@@ -25,6 +27,7 @@ class Routes {
   static const String scan = '/scan';
   static const String scanResults = '/scan-results';
   static const String inventory = '/inventory';
+  static const String itemDetail = '/inventory/item/:id';
   static const String recipes = '/recipes';
   static const String recipeDetail = '/recipes/detail/:id';
   static const String recipePreview = '/recipe-preview';
@@ -127,6 +130,15 @@ class AppRouter {
         path: Routes.recipePreview,
         name: 'recipePreview',
         builder: (context, state) => const RecipePreviewScreen(),
+      ),
+      GoRoute(
+        path: Routes.itemDetail,
+        name: 'itemDetail',
+        builder: (context, state) {
+          final itemId = state.pathParameters['id'] ?? '';
+          final item = state.extra as InventoryItem?;
+          return ItemDetailScreen(itemId: itemId, item: item);
+        },
       ),
     ],
   );
