@@ -120,24 +120,6 @@ class InventoryController extends Notifier<InventoryState> {
 
   InventoryRepository get _repository => ref.read(inventoryRepositoryProvider);
 
-  /// Load inventory data from Firestore (No longer needed as we use stream)
-  Future<void> _loadData() async {
-    // This method is now redundant but kept for refresh functionality if needed
-    state = state.copyWith(isLoading: true);
-    try {
-      final items = await _repository.getInventory();
-      state = state.copyWith(
-        isLoading: false,
-        allItems: items,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString(),
-      );
-    }
-  }
-
   /// Refresh data
   Future<void> refresh() async {
     // With streams, refresh might not be needed, but good for forced sync
