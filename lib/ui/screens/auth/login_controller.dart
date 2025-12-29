@@ -128,7 +128,7 @@ class LoginController extends Notifier<LoginState> {
         });
       }
     } catch (e) {
-      print("Error creating user in Firestore: $e");
+      debugPrint("Error creating user in Firestore: $e");
     }
   }
 
