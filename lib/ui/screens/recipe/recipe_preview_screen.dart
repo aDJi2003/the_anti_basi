@@ -39,7 +39,7 @@ class RecipePreviewScreen extends ConsumerWidget {
                       recipes: state.generatedRecipes,
                       expiringItemNames: state.expiringItemNames,
                       onToggle: controller.toggleRecipeSelection,
-                      onTap: (recipe) => controller.navigateToDetail(context, recipe),
+                      onTap: (recipe) => controller.showPreviewDetail(context, recipe),
                     ),
             ),
 

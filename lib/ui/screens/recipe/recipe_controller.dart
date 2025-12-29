@@ -9,6 +9,7 @@ import '../../../data/providers/auth_state_provider.dart';
 import '../../../data/repositories/inventory_repository.dart';
 import '../../../data/repositories/recipe_repository.dart';
 import '../../../data/services/gemini_service.dart';
+import 'widgets/recipe_preview_sheet.dart';
 
 /// State for recipe screen
 class RecipeState {
@@ -247,10 +248,20 @@ class RecipeController extends Notifier<RecipeState> {
     state = state.copyWith(selectedRecipe: recipe);
   }
 
-  /// Navigate to recipe detail
+  /// Navigate to recipe detail (for saved recipes)
   void navigateToDetail(BuildContext context, Recipe recipe) {
     selectRecipe(recipe);
     context.push('${Routes.recipes}/${recipe.id}');
+  }
+
+  /// Show preview detail sheet (for generated recipes not yet saved)
+  void showPreviewDetail(BuildContext context, Recipe recipe) {
+    selectRecipe(recipe);
+    RecipePreviewSheet.show(
+      context,
+      recipe: recipe,
+      inventory: state.inventory,
+    );
   }
 
   /// Validate ingredients for selected recipe
