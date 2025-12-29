@@ -70,66 +70,75 @@ class HomeState {
 
 /// Home controller - handles home screen logic
 class HomeController extends Notifier<HomeState> {
+  // Cache user info to avoid losing it on rebuilds
+  String _cachedUserName = 'User';
+  String? _cachedUserAvatarUrl;
+  bool _userLoaded = false;
+
   @override
   HomeState build() {
     // Watch auth state - this causes rebuild when user changes
     ref.watch(currentUserIdProvider);
-    _loadData();
-    return const HomeState(isLoading: true);
+
+    // Watch real-time inventory stream for automatic updates
+    final inventoryAsync = ref.watch(inventoryStreamProvider);
+
+    // Load user profile (one-time, doesn't need real-time updates)
+    if (!_userLoaded) {
+      _loadUserProfile();
+    }
+
+    // Process inventory data from stream
+    final allItems = inventoryAsync.value ?? [];
+    final expiringItems = allItems
+        .where(
+          (item) =>
+              item.expiryStatus == ExpiryStatus.expired ||
+              item.expiryStatus == ExpiryStatus.expiringToday ||
+              item.expiryStatus == ExpiryStatus.expiringSoon,
+        )
+        .toList()
+      ..sort((a, b) => a.daysUntilExpiry.compareTo(b.daysUntilExpiry));
+
+    return HomeState(
+      isLoading: inventoryAsync.isLoading,
+      userName: _cachedUserName,
+      userAvatarUrl: _cachedUserAvatarUrl,
+      totalItems: allItems.length,
+      expiringItems: expiringItems,
+      lastUpdated: DateTime.now(),
+      errorMessage: inventoryAsync.hasError ? inventoryAsync.error.toString() : null,
+    );
   }
 
-  InventoryRepository get _inventoryRepo => ref.read(inventoryRepositoryProvider);
   UserRepository get _userRepo => ref.read(userRepositoryProvider);
 
-  /// Load home data from Firestore
-  Future<void> _loadData() async {
+  /// Load user profile from Firestore
+  Future<void> _loadUserProfile() async {
     try {
-      // Fetch user profile from Firestore
       debugPrint('[HomeController] Fetching user profile...');
       final userProfile = await _userRepo.getCurrentUser();
       debugPrint('[HomeController] Got user: ${userProfile?.displayName}');
 
-      final userName = userProfile?.firstName ?? 'User';
-      final userAvatar = userProfile?.photoURL;
+      _cachedUserName = userProfile?.firstName ?? 'User';
+      _cachedUserAvatarUrl = userProfile?.photoURL;
+      _userLoaded = true;
 
-      // Fetch inventory from Firestore
-      debugPrint('[HomeController] Fetching inventory...');
-      final allItems = await _inventoryRepo.getInventory();
-      debugPrint('[HomeController] Got ${allItems.length} items');
-
-      // Filter expiring items (within 3 days or already expired)
-      final expiringItems =
-          allItems
-              .where(
-                (item) =>
-                    item.expiryStatus == ExpiryStatus.expired ||
-                    item.expiryStatus == ExpiryStatus.expiringToday ||
-                    item.expiryStatus == ExpiryStatus.expiringSoon,
-              )
-              .toList()
-            ..sort((a, b) => a.daysUntilExpiry.compareTo(b.daysUntilExpiry));
-
-      debugPrint('[HomeController] Expiring items: ${expiringItems.length}');
-
+      // Trigger rebuild with updated user info
       state = state.copyWith(
-        isLoading: false,
-        userName: userName,
-        userAvatarUrl: userAvatar,
-        totalItems: allItems.length,
-        expiringItems: expiringItems,
-        lastUpdated: DateTime.now(),
+        userName: _cachedUserName,
+        userAvatarUrl: _cachedUserAvatarUrl,
       );
-    } catch (e, stack) {
-      debugPrint('[HomeController] ERROR: $e');
-      debugPrint('[HomeController] Stack: $stack');
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    } catch (e) {
+      debugPrint('[HomeController] Error loading user profile: $e');
+      _userLoaded = true; // Mark as loaded to prevent infinite retries
     }
   }
 
   /// Refresh data
   Future<void> refresh() async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
-    await _loadData();
+    // Invalidate stream to force refresh from Firestore
+    ref.invalidate(inventoryStreamProvider);
   }
 
   /// Navigate to inventory

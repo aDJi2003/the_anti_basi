@@ -114,6 +114,44 @@ class ItemDetailController extends Notifier<ItemDetailState> {
   Future<bool> markAsConsumed() async {
     return updateQuantity(0);
   }
+
+  /// Update item category
+  Future<bool> updateCategory(ItemCategory newCategory) async {
+    final item = state.item;
+    if (item == null) return false;
+
+    state = state.copyWith(isUpdating: true);
+
+    try {
+      final updatedItem = item.copyWith(category: newCategory);
+      await _repository.updateItem(updatedItem);
+      state = state.copyWith(item: updatedItem, isUpdating: false);
+      return true;
+    } catch (e) {
+      debugPrint('[ItemDetailController] Error updating category: $e');
+      state = state.copyWith(isUpdating: false, error: 'Failed to update');
+      return false;
+    }
+  }
+
+  /// Update item expiry date
+  Future<bool> updateExpiryDate(DateTime newDate) async {
+    final item = state.item;
+    if (item == null) return false;
+
+    state = state.copyWith(isUpdating: true);
+
+    try {
+      final updatedItem = item.copyWith(expiryDate: newDate);
+      await _repository.updateItem(updatedItem);
+      state = state.copyWith(item: updatedItem, isUpdating: false);
+      return true;
+    } catch (e) {
+      debugPrint('[ItemDetailController] Error updating expiry date: $e');
+      state = state.copyWith(isUpdating: false, error: 'Failed to update');
+      return false;
+    }
+  }
 }
 
 /// Provider for item detail controller

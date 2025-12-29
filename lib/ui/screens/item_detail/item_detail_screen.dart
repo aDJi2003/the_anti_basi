@@ -7,7 +7,9 @@ import '../../../config/app_colors_extension.dart';
 import '../../../core/date_utils.dart' as app_date;
 import '../../../data/models/inventory_item.dart';
 import 'item_detail_controller.dart';
+import 'widgets/category_editor_sheet.dart';
 import 'widgets/detail_info_card.dart';
+import 'widgets/expiry_date_editor_sheet.dart';
 import 'widgets/expiry_status_header.dart';
 import 'widgets/quantity_editor_sheet.dart';
 
@@ -239,6 +241,7 @@ class _ItemDetailBody extends ConsumerWidget {
                 iconColor: item.category.color,
                 label: 'Category',
                 value: item.category.displayName,
+                onTap: () => _showCategoryEditor(context),
               ),
             ),
           ],
@@ -281,7 +284,7 @@ class _ItemDetailBody extends ConsumerWidget {
                 subtitle: '$addedDate at $addedTime',
                 isFirst: true,
               ),
-              // Expiry date
+              // Expiry date (editable)
               _TimelineItem(
                 icon: daysUntil < 0
                     ? Icons.error_outline_rounded
@@ -289,7 +292,30 @@ class _ItemDetailBody extends ConsumerWidget {
                 iconColor: _getExpiryColor(daysUntil),
                 title: daysUntil < 0 ? 'Expired' : 'Expires',
                 subtitle: expiryDate,
-                trailing: _buildDaysChip(daysUntil, theme),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildDaysChip(daysUntil, theme),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () => _showExpiryDateEditor(context),
+                      child: Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: context.colors.surfaceLight,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: context.colors.border),
+                        ),
+                        child: Icon(
+                          Icons.edit_outlined,
+                          size: 14,
+                          color: context.colors.textMuted,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 isLast: true,
               ),
             ],
@@ -432,6 +458,24 @@ class _ItemDetailBody extends ConsumerWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => QuantityEditorSheet(item: item),
+    );
+  }
+
+  void _showCategoryEditor(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CategoryEditorSheet(item: item),
+    );
+  }
+
+  void _showExpiryDateEditor(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ExpiryDateEditorSheet(item: item),
     );
   }
 
