@@ -448,6 +448,7 @@ class _ItemDetailBody extends ConsumerWidget {
             ),
           ],
         ),
+        const SizedBox(height: 16),
       ],
     );
   }
