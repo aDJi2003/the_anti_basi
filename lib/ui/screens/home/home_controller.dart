@@ -73,18 +73,22 @@ class HomeController extends Notifier<HomeState> {
   // Cache user info to avoid losing it on rebuilds
   String _cachedUserName = 'User';
   String? _cachedUserAvatarUrl;
-  bool _userLoaded = false;
+  String? _lastLoadedUserId;
 
   @override
   HomeState build() {
     // Watch auth state - this causes rebuild when user changes
-    ref.watch(currentUserIdProvider);
+    final currentUserId = ref.watch(currentUserIdProvider);
 
     // Watch real-time inventory stream for automatic updates
     final inventoryAsync = ref.watch(inventoryStreamProvider);
 
-    // Load user profile (one-time, doesn't need real-time updates)
-    if (!_userLoaded) {
+    // Load user profile when user changes (or first time)
+    if (currentUserId != _lastLoadedUserId) {
+      _lastLoadedUserId = currentUserId;
+      // Reset cached values to avoid showing stale data
+      _cachedUserName = 'User';
+      _cachedUserAvatarUrl = null;
       _loadUserProfile();
     }
 
@@ -122,7 +126,6 @@ class HomeController extends Notifier<HomeState> {
 
       _cachedUserName = userProfile?.firstName ?? 'User';
       _cachedUserAvatarUrl = userProfile?.photoURL;
-      _userLoaded = true;
 
       // Trigger rebuild with updated user info
       state = state.copyWith(
@@ -131,7 +134,6 @@ class HomeController extends Notifier<HomeState> {
       );
     } catch (e) {
       debugPrint('[HomeController] Error loading user profile: $e');
-      _userLoaded = true; // Mark as loaded to prevent infinite retries
     }
   }
 

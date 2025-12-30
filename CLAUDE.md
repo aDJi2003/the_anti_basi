@@ -303,3 +303,58 @@ flutter_dotenv: ^6.0.0
 - Computed getters for derived state (e.g., `isConsumed`, `expiryStatus`)
 - Debug prints with prefixes: `[ControllerName] message`
 - Error handling with try-catch and user-friendly messages
+
+## Continuous-Claude Integration
+
+### Session Continuity
+
+Project ini menggunakan Continuous-Claude untuk manajemen context. File penting:
+- `thoughts/ledger.md` — Quick state snapshot
+- `thoughts/handoffs/` — Detailed handoff documents
+
+### Trigger Actions
+
+Ketika user menyebutkan prompt berikut, **WAJIB baca file terkait dahulu**:
+
+| Prompt User | Aksi Claude |
+|-------------|-------------|
+| "resume work", "continue", "lanjut", "pick up" | Baca `thoughts/ledger.md` DAN file terbaru di `thoughts/handoffs/` |
+| "save state", "update ledger" | Tulis state saat ini ke `thoughts/ledger.md` |
+| "create handoff", "wrap up", "done for today" | Buat file baru di `thoughts/handoffs/YYYY-MM-DD-summary.md` |
+
+### Ledger Format
+
+```markdown
+## Current State
+- **Task**: [apa yang sedang dikerjakan]
+- **Progress**: [persentase dan status]
+- **Files Modified**: [file yang diubah]
+- **Next**: [langkah selanjutnya]
+- **Blockers**: [jika ada masalah]
+
+Updated: [timestamp]
+```
+
+### Handoff Format
+
+```markdown
+## Handoff: [Task Name]
+Date: YYYY-MM-DD
+
+### Context
+[Penjelasan singkat task]
+
+### What Was Done
+1. [completed item]
+2. [completed item]
+
+### Decisions Made
+- [keputusan dan alasannya]
+
+### Next Steps
+1. [ ] [todo item]
+2. [ ] [todo item]
+
+### Files to Review
+- [file paths]
+```
