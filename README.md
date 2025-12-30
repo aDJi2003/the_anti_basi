@@ -61,7 +61,7 @@ Built with ❤️ using Google Technologies:
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/yourusername/the_anti_basi.git
+    git clone https://github.com/aDJi2003/the_anti_basi.git
     cd the_anti_basi
     ```
 
